@@ -10,16 +10,17 @@
 
 namespace UltEngine {
     using vec3u = glm::vec<3, unsigned>;
+    using vec2u = glm::vec<2, unsigned>;
 
     struct Vertex {
         glm::vec3 position;
         glm::vec3 normal;
-        glm::vec2 uv;
+        glm::vec2 texCoords = { 0.0f, 0.0f };
     };
 
     struct Texture {
         unsigned id;
-        std::string type;
+        int type;
     };
 } // UltEngine
 
