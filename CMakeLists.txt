@@ -14,6 +14,16 @@ add_executable(engine
         dependencies/GLAD/src/glad.c
         dependencies/STB/include/stb_image.h
         src/Main.cpp
+        src/Engine.cpp
+        include/Engine.h
+        include/Options.h
+        src/Shader.cpp
+        include/Shader.h
+        src/Model.cpp
+        include/Model.h
+        include/Data.h
+        src/Mesh.cpp
+        include/Mesh.h
 )
 
 target_include_directories(engine PRIVATE ${PROJECT_SOURCE_DIR}/include)
