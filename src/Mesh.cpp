@@ -3,16 +3,19 @@
 //
 
 #include <cstddef>
+#include <iostream>
+#include <format>
 #include "Mesh.h"
 #include "glad/glad.h"
 
 namespace UltEngine {
-    Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<vec3u>& triangles, const std::vector<vec2u>& lines, const std::vector<unsigned>& points, const std::vector<Texture>& textures) : vertices(vertices), triangles(triangles), lines(lines), points(points), textures(textures)
-    {
+    Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<vec3u>& triangles, const std::vector<vec2u>& lines, const std::vector<unsigned>& points, const std::vector<Texture>& textures) : vertices(vertices), triangles(triangles), lines(lines), points(points), textures(textures) {
+        // Create objects (should not be done in update, because otherwise OpenGL would create multiple redundant objects)
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
 
+        // Update buffer data
         update();
     }
 
@@ -36,6 +39,39 @@ namespace UltEngine {
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, texCoords)));
 
+        glBindVertexArray(0);
+    }
+
+    void Mesh::draw(const Shader &shader) const {
+        unsigned diffuseNum = 0;
+        unsigned specularNum = 0;
+
+        for (unsigned i = 0; i < textures.size(); i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+
+            std::string name;
+            std::string number;
+            switch (textures[i].type) {
+                case aiTextureType_DIFFUSE:
+                    name = "diffuse";
+                    number = std::to_string(diffuseNum++);
+                    break;
+                case aiTextureType_SPECULAR:
+                    name = "specular";
+                    number = std::to_string(specularNum++);
+                    break;
+                default:
+                    std::cerr << std::format("Unsupported texture type {}", textures[i].type);
+                    break;
+            }
+
+            shader.set(std::string("material.").append(name).append(number), static_cast<int>(i));
+        }
+        // Set back to default
+        glActiveTexture(GL_TEXTURE0);
+
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(triangles.size()), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 } // UltEngine

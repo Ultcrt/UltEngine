@@ -6,6 +6,7 @@
 #define ULTENGINE_DATA_H
 
 #include <string>
+#include <assimp/scene.h>
 #include "glm/glm.hpp"
 
 namespace UltEngine {

@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "Data.h"
+#include "Shader.h"
 
 namespace UltEngine {
     class Mesh {
@@ -24,6 +25,8 @@ namespace UltEngine {
         Mesh(const std::vector<Vertex>& vertices, const std::vector<vec3u>& triangles, const std::vector<vec2u>& lines, const std::vector<unsigned>& points, const std::vector<Texture>& textures);
 
         void update();
+
+        void draw(const Shader& shader) const;
     };
 } // UltEngine
 

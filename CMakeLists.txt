@@ -19,11 +19,11 @@ add_executable(engine
         include/Options.h
         src/Shader.cpp
         include/Shader.h
-        src/Model.cpp
-        include/Model.h
         include/Data.h
         src/Mesh.cpp
         include/Mesh.h
+        src/Scene.cpp
+        include/Scene.h
 )
 
 target_include_directories(engine PRIVATE ${PROJECT_SOURCE_DIR}/include)
