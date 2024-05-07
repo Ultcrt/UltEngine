@@ -9,10 +9,9 @@
 #include "Scene.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "glad/glad.h"
 
 namespace UltEngine {
-    Scene::Scene(const std::shared_ptr<UltEngine::Engine> &pEngine): pEngine_(pEngine) {}
-
     void Scene::load(const std::string &path) {
         std::string dir;
 
@@ -66,8 +65,8 @@ namespace UltEngine {
 
             // Texture coordinate can be empty
             if (pMesh->mTextureCoords[0]) {
-                vertex.texCoords.x = pMesh->mTextureCoords[0][i].x;
-                vertex.texCoords.y = pMesh->mTextureCoords[0][i].y;
+                vertex.texCoord.x = pMesh->mTextureCoords[0][i].x;
+                vertex.texCoord.y = pMesh->mTextureCoords[0][i].y;
             }
 
             vertices.emplace_back(vertex);
@@ -162,8 +161,18 @@ namespace UltEngine {
     }
 
     void Scene::draw(const Shader &shader) const {
+        shader.use();
+
+        shader.set("projection", pCamera_->getProjection());
+        shader.set("view", pCamera_->getView());
+        shader.set("model", glm::mat4(1.0f));
+
         for (const Mesh& mesh: meshes_) {
             mesh.draw(shader);
         }
+    }
+
+    void Scene::setCamera(const std::shared_ptr<Camera> &pCamera) {
+        pCamera_ = pCamera;
     }
 } // UltEngine

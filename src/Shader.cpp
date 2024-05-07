@@ -6,13 +6,13 @@
 #include <sstream>
 #include <format>
 #include "Shader.h"
-#include "glad/glad.h"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace UltEngine {
     Shader::Shader(const std::string &vertexShaderPath, const std::string &fragmentShaderPath) {
         // Create shader object
-        vertexShaderID = CreateShaderObjectFromFile_(vertexShaderPath);
-        fragmentShaderID = CreateShaderObjectFromFile_(fragmentShaderPath);
+        vertexShaderID = CreateShaderObjectFromFile_(vertexShaderPath, GL_VERTEX_SHADER);
+        fragmentShaderID = CreateShaderObjectFromFile_(fragmentShaderPath, GL_FRAGMENT_SHADER);
 
         // Create and link program
         programID = glCreateProgram();
@@ -28,7 +28,7 @@ namespace UltEngine {
         }
     }
 
-    unsigned Shader::CreateShaderObjectFromFile_(const std::string &path) {
+    unsigned Shader::CreateShaderObjectFromFile_(const std::string &path, GLenum type) {
         // Create file streams that throws error when encountering failbit and badbit
         std::ifstream fileStream;
         fileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -52,14 +52,14 @@ namespace UltEngine {
         unsigned shaderID;
         int success;
 
-        shaderID = glCreateShader(GL_VERTEX_SHADER);
+        shaderID = glCreateShader(type);
         glShaderSource(shaderID, 1, &cShaderCode, nullptr);
         glCompileShader(shaderID);
         glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
         if (!success) {
             char info[512];
             glGetShaderInfoLog(shaderID, 512, nullptr, info);
-            throw std::runtime_error(std::format("Cannot compile shader:\n{}", info));
+            throw std::runtime_error(std::format("Cannot compile shader at {}:\n{}", path, info));
         }
 
         return shaderID;
@@ -80,5 +80,9 @@ namespace UltEngine {
 
     void Shader::set(const std::string &name, float val) const {
         glUniform1f(glGetUniformLocation(programID, name.c_str()), val);
+    }
+
+    void Shader::set(const std::string &name, const glm::mat4 &val, bool transpose) const {
+        glUniformMatrix4fv(glGetUniformLocation(programID, name.c_str()), 1, transpose, glm::value_ptr(val));
     }
 } // UltEngine

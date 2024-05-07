@@ -9,16 +9,16 @@
 #include <memory>
 #include <unordered_map>
 #include <assimp/scene.h>
-#include "Engine.h"
 #include "Mesh.h"
 #include "Data.h"
+#include "Camera.h"
 
 namespace UltEngine {
     class Scene {
     private:
-        std::shared_ptr<UltEngine::Engine> pEngine_;
         std::vector<Mesh> meshes_;
         std::unordered_map<std::string, unsigned> textureIDs_;
+        std::shared_ptr<Camera> pCamera_;
 
         void loadNode_(const aiNode* pNode, const aiScene* pScene, const std::string& dir);
         Mesh loadMesh_(const aiMesh* pMesh, const aiScene* pScene, const std::string& dir);
@@ -26,11 +26,11 @@ namespace UltEngine {
         unsigned loadTexture_(const std::string& path);
 
     public:
-        explicit Scene(const std::shared_ptr<UltEngine::Engine>& pEngine);
-
         void load(const std::string& path);
 
         void draw(const Shader& shader) const;
+
+        void setCamera(const std::shared_ptr<Camera>& pCamera);
     };
 } // UltEngine
 

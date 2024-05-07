@@ -8,17 +8,26 @@
 #include "Options.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "Scene.h"
+#include "Observable.h"
 
 namespace UltEngine {
     class Engine {
-    public:
-        explicit Engine(Options::EngineOptions options = {});
-        virtual ~Engine();
-        void start();
-
     private:
-        GLFWwindow* pWindow_ = nullptr;
-        Options::EngineOptions options_;
+        std::string title;
+        int width;
+        int height;
+
+    public:
+        double deltaTime = 0.0;
+
+        explicit Engine(const Options::EngineOptions& options = {});
+        virtual ~Engine();
+        void render(const Scene& scene);
+
+        Observable<void (const Engine&)> inputObservable;
+
+        GLFWwindow* pWindow = nullptr;
     };
 } // UltEngine
 

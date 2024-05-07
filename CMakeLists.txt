@@ -24,6 +24,12 @@ add_executable(engine
         include/Mesh.h
         src/Scene.cpp
         include/Scene.h
+        src/Camera.cpp
+        include/Camera.h
+        src/TransformationNode.cpp
+        include/TransformationNode.h
+        src/Observable.cpp
+        include/Observable.h
 )
 
 target_include_directories(engine PRIVATE ${PROJECT_SOURCE_DIR}/include)

@@ -7,7 +7,7 @@
 #include "Engine.h"
 
 namespace UltEngine {
-    Engine::Engine(Options::EngineOptions options): options_(std::move(options)) {
+    Engine::Engine(const Options::EngineOptions& options): title(options.title), width(options.width), height(options.height) {
         // Init GLFW
         if (!glfwInit()) {
             throw std::runtime_error("Cannot initialize GLFW");
@@ -15,16 +15,14 @@ namespace UltEngine {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    }
 
-    void Engine::start() {
         // Create GLFW window
-        pWindow_ = glfwCreateWindow(options_.width, options_.height, options_.title.c_str(), nullptr, nullptr);
-        if (!pWindow_) {
+        pWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+        if (!pWindow) {
             glfwTerminate();
             throw std::runtime_error("Cannot create GLFW window");
         }
-        glfwMakeContextCurrent(pWindow_);
+        glfwMakeContextCurrent(pWindow);
 
         // Init GLAD
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
@@ -32,19 +30,29 @@ namespace UltEngine {
         }
 
         // Set up viewport
-        glfwSetFramebufferSizeCallback(pWindow_, [](GLFWwindow* win, int w, int h){
+        glfwSetFramebufferSizeCallback(pWindow, [](GLFWwindow* win, int w, int h){
             glViewport(0, 0, w, h);
         });
+    }
 
+    void Engine::render(const Scene& scene) {
         // Render loop
-        while (!glfwWindowShouldClose(pWindow_)) {
-            if (glfwGetKey(pWindow_, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-                glfwSetWindowShouldClose(pWindow_, true);
+        // TODO: Test code
+        Shader shader("../src/shaders/BlinnPhong.vert", "../src/shaders/BlinnPhong.frag");
+
+        double lastFrameTime = glfwGetTime();
+        while (!glfwWindowShouldClose(pWindow)) {
+            deltaTime = glfwGetTime() - lastFrameTime;
+
+            if (glfwGetKey(pWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+                glfwSetWindowShouldClose(pWindow, true);
 
             glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            glfwSwapBuffers(pWindow_);
+            scene.draw(shader);
+
+            glfwSwapBuffers(pWindow);
             glfwPollEvents();
         }
     }
