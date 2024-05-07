@@ -112,7 +112,7 @@ namespace UltEngine {
     }
 
     unsigned Scene::loadTexture_(const std::string& path) {
-        const std::string absolute = std::filesystem::absolute(path);
+        const std::string absolute = std::filesystem::absolute(path).generic_string();
 
         if (textureIDs_.find(absolute) == textureIDs_.end()) {
             stbi_set_flip_vertically_on_load(true);

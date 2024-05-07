@@ -9,7 +9,6 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "Scene.h"
-#include "Observable.h"
 
 namespace UltEngine {
     class Engine {
@@ -24,8 +23,6 @@ namespace UltEngine {
         explicit Engine(const Options::EngineOptions& options = {});
         virtual ~Engine();
         void render(const Scene& scene);
-
-        Observable<void (const Engine&)> inputObservable;
 
         GLFWwindow* pWindow = nullptr;
     };

@@ -6,38 +6,38 @@
 #define ULTENGINE_OBSERVABLE_H
 
 #include <vector>
+#include <memory>
+#include "Observer.h"
 
 namespace UltEngine {
-    template <class Observer>
+    template<class... Args>
     class Observable {
     private:
-        std::vector<Observer> observers_;
+        std::vector<std::shared_ptr<Observer<Args...>>> pObservers_;
 
     public:
-        std::size_t add(Observer observer);
+        std::size_t add(const std::shared_ptr<Observer<Args...>>& pObserver);
         void remove(std::size_t idx);
 
-        template<class... Args>
         void notifyAll(Args&&... args);
     };
 
-    template<class Observer>
-    template<class... Args>
-    void Observable<Observer>::notifyAll(Args &&... args) {
-        for (auto&& observer: observers_) {
-            observer(args...);
+    template<class ...Args>
+    inline std::size_t Observable<Args...>::add(const std::shared_ptr<Observer<Args...>>& pObserver) {
+        pObservers_.emplace_back(pObserver);
+        return pObservers_.size() - 1;
+    }
+
+    template<class ...Args>
+    inline void Observable<Args...>::remove(std::size_t idx) {
+        pObservers_.erase(pObservers_.begin() + idx);
+    }
+
+    template<class ...Args>
+    inline void Observable<Args...>::notifyAll(Args && ...args) {
+        for (auto&& pObserver : pObservers_) {
+            pObserver->update(args...);
         }
-    }
-
-    template<class Observer>
-    void Observable<Observer>::remove(std::size_t idx) {
-        observers_.erase(observers_.begin() + idx);
-    }
-
-    template<class Observer>
-    std::size_t Observable<Observer>::add(Observer observer) {
-        observers_.emplace_back(observer);
-        return observers_.size();
     }
 } // UltEngine
 

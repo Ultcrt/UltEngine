@@ -8,16 +8,12 @@
 #include <glm/glm.hpp>
 #include "Options.h"
 #include "TransformationNode.h"
-#include "Engine.h"
 
 namespace UltEngine {
     class Camera: public TransformationNode {
     private:
         glm::mat4 projection_ = glm::mat4(1.0f);
         glm::mat4 view_ = glm::mat4(1.0f);
-
-        double lastX_;
-        double lastY_;
 
     public:
         float fov;
@@ -29,8 +25,6 @@ namespace UltEngine {
                         const glm::vec3& target = {0.0f, 0.0f, -1.0f},
                         const glm::vec3& up = {0.0f, 1.0f, 0.0f},
                         const Options::CameraOptions& options = {});
-
-        void registerInput(const Engine& engine);
 
         void updateView();
         void updateProjection();

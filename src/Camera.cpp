@@ -8,7 +8,7 @@
 #include "glm/glm.hpp"
 
 namespace UltEngine {
-    Camera::Camera(const glm::vec3& position, const glm::vec3& target, const glm::vec3& up, const Options::CameraOptions &options):
+    Camera::Camera(const glm::vec3& position, const glm::vec3& target, const glm::vec3& up, const Options::CameraOptions& options):
     fov(options.fov),
     aspect(options.aspect),
     near(options.near),
@@ -37,12 +37,5 @@ namespace UltEngine {
 
     glm::mat4 Camera::getView() const {
         return view_;
-    }
-
-    void Camera::registerInput(const Engine &engine) {
-        // Register cursor move input callback
-        glfwSetCursorPosCallback(engine.pWindow, [](GLFWwindow* window, double x, double y){
-
-        });
     }
 } // UltEngine
