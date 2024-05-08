@@ -8,9 +8,10 @@
 #include <vector>
 #include "Data.h"
 #include "Shader.h"
+#include "TransformationNode.h"
 
 namespace UltEngine {
-    class Mesh {
+    class Mesh: public TransformationNode {
     public:
         std::vector<Vertex> vertices;
         std::vector<vec3u> triangles;
@@ -24,7 +25,7 @@ namespace UltEngine {
 
         Mesh(const std::vector<Vertex>& vertices, const std::vector<vec3u>& triangles, const std::vector<vec2u>& lines, const std::vector<unsigned>& points, const std::vector<Texture>& textures);
 
-        void update();
+        void upload();
 
         void draw(const Shader& shader) const;
     };

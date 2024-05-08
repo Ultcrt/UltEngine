@@ -15,11 +15,11 @@ namespace UltEngine {
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
 
-        // Update buffer data
-        update();
+        // Upload to GPU
+        upload();
     }
 
-    void Mesh::update() {
+    void Mesh::upload() {
         glBindVertexArray(VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -43,6 +43,8 @@ namespace UltEngine {
     }
 
     void Mesh::draw(const Shader &shader) const {
+        shader.set("model", transformation_);
+
         unsigned diffuseNum = 0;
         unsigned specularNum = 0;
 
