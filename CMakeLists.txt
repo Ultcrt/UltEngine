@@ -31,8 +31,7 @@ add_executable(engine
         src/Observable.cpp
         include/Observable.h
         include/Observer.h
-        include/InputObserver.h
-        src/InputObserver.cpp)
+)
 
 target_include_directories(engine PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(engine PRIVATE ${PROJECT_SOURCE_DIR}/dependencies/GLAD/include)

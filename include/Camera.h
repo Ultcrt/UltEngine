@@ -8,18 +8,26 @@
 #include <glm/glm.hpp>
 #include "Options.h"
 #include "TransformationNode.h"
+#include "Observer.h"
 
 namespace UltEngine {
-    class Camera: public TransformationNode {
+    class Camera: public TransformationNode, public InputObserver {
     private:
         glm::mat4 projection_ = glm::mat4(1.0f);
         glm::mat4 view_ = glm::mat4(1.0f);
+
+        double lastCursorPoseX_ = 0.0;
+        double lastCursorPoseY_ = 0.0;
 
     public:
         float fov;
         float aspect;
         float near;
         float far;
+
+        float moveSpeed;
+        float rotateSensitivity;
+        float zoomSensitivity;
 
         explicit Camera(const glm::vec3& position = {0.0f, 0.0f, 0.0f},
                         const glm::vec3& target = {0.0f, 0.0f, -1.0f},
@@ -28,6 +36,8 @@ namespace UltEngine {
 
         void updateView();
         void updateProjection();
+
+        void update(GLFWwindow* pWindow) override;
 
         [[nodiscard]] glm::mat4 getProjection() const;
         [[nodiscard]] glm::mat4 getView() const;

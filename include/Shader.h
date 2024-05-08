@@ -6,7 +6,7 @@
 #define ULTENGINE_SHADER_H
 
 #include <string>
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 #include "glad/glad.h"
 
 namespace UltEngine {

@@ -7,6 +7,8 @@ int main()
     auto pEngine = std::make_shared<UltEngine::Engine>();
     auto pCamera = std::make_shared<UltEngine::Camera>();
 
+    pEngine->inputObservable.add(pCamera);
+
     UltEngine::Scene scene;
 
     scene.setCamera(pCamera);

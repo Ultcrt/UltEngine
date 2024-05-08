@@ -6,19 +6,21 @@
 #define ULTENGINE_ENGINE_H
 
 #include "Options.h"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
 #include "Scene.h"
+#include "Observable.h"
 
 namespace UltEngine {
     class Engine {
     private:
-        std::string title;
-        int width;
-        int height;
+        std::string title_;
+        int width_;
+        int height_;
 
     public:
+        Observable<GLFWwindow*> inputObservable;
+
         double deltaTime = 0.0;
+        glm::vec2 scrollOffset = {0.0, 0.0};
 
         explicit Engine(const Options::EngineOptions& options = {});
         virtual ~Engine();

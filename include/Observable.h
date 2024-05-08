@@ -19,7 +19,7 @@ namespace UltEngine {
         std::size_t add(const std::shared_ptr<Observer<Args...>>& pObserver);
         void remove(std::size_t idx);
 
-        void notifyAll(Args&&... args);
+        void notifyAll(Args... args);
     };
 
     template<class ...Args>
@@ -34,9 +34,9 @@ namespace UltEngine {
     }
 
     template<class ...Args>
-    inline void Observable<Args...>::notifyAll(Args && ...args) {
-        for (auto&& pObserver : pObservers_) {
-            pObserver->update(args...);
+    inline void Observable<Args...>::notifyAll(Args... args) {
+        for (const auto& pObserver : pObservers_) {
+            pObserver->update(std::forward<Args>(args)...);
         }
     }
 } // UltEngine
