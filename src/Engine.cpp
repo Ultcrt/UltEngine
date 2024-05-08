@@ -46,6 +46,9 @@ namespace UltEngine {
 
         // Set up cursor
         glfwSetInputMode(pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        // Enabling features
+        glEnable(GL_DEPTH_TEST);
     }
 
     void Engine::render(const Scene& scene) {
@@ -68,7 +71,7 @@ namespace UltEngine {
 
             // Clear up color
             glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             scene.draw(shader);
             glfwSwapBuffers(pWindow);

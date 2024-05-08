@@ -63,7 +63,7 @@ namespace UltEngine {
             translation -= moveOffset * right;
 
         // Rotate
-        float threshold = (89.0f) * glm::pi<float>() / 180.0f;
+        float rotateThreshold = glm::radians(89.0f);
         double cursorPoseX, cursorPoseY;
         glfwGetCursorPos(pWindow, &cursorPoseX, &cursorPoseY);
         double rotateOffsetX = (lastCursorPoseX_ - cursorPoseX) * rotateSensitivity * deltaTime;
@@ -71,14 +71,17 @@ namespace UltEngine {
 
         rotation.y += static_cast<float>(rotateOffsetX);
         rotation.x += static_cast<float>(rotateOffsetY);
-        rotation.x = std::clamp(rotation.x, -threshold, threshold);                        // Clamp to avoid flip
+        rotation.x = std::clamp(rotation.x, -rotateThreshold, rotateThreshold);                        // Clamp to avoid flip
         // Update cursor position
         lastCursorPoseX_ = cursorPoseX;
         lastCursorPoseY_ = cursorPoseY;
 
         // Zoom
+        float zoomMinThreshold = glm::radians(1.0f);
+        float zoomMaxThreshold = glm::radians(179.0f);
         float scrollOffsetY = pEngine->scrollOffset.y;
         fov += scrollOffsetY * zoomSensitivity * static_cast<float>(deltaTime);
+        fov = std::clamp(fov, zoomMinThreshold, zoomMaxThreshold);
 
         // Update view and projection matrix
         updateView();

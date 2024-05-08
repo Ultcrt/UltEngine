@@ -25,8 +25,8 @@ namespace UltEngine {
 
             // Movement options
             float moveSpeed = 2.5f;
-            float rotateSensitivity = 0.2f;
-            float zoomSensitivity = 0.2f;
+            float rotateSensitivity = 0.5f;
+            float zoomSensitivity = 5.0f;
         };
     } // Options
 } // UltEngine
