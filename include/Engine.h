@@ -8,6 +8,7 @@
 #include "Options.h"
 #include "Scene.h"
 #include "Observable.h"
+#include <Shader.h>
 
 namespace UltEngine {
     class Engine {
@@ -18,6 +19,8 @@ namespace UltEngine {
 
     public:
         Observable<GLFWwindow*> inputObservable;
+
+        std::shared_ptr<Shader> pDefaultShader;
 
         double deltaTime = 0.0;
         glm::vec2 scrollOffset = {0.0, 0.0};

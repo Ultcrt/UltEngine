@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include "Engine.h"
+#include "Shader.h"
 
 namespace UltEngine {
     Engine::Engine(const Options::EngineOptions& options): title_(options.title), width_(options.width), height_(options.height) {
@@ -44,18 +45,21 @@ namespace UltEngine {
             pEngine->scrollOffset.y = static_cast<float>(offsetY);
         });
 
+        // Initialize gl context related member
+        pDefaultShader = std::make_shared<Shader>(PROJECT_SOURCE_DIR + std::string("/src/shaders/BlinnPhong.vert"), PROJECT_SOURCE_DIR + std::string("/src/shaders/BlinnPhong.frag"));
+
         // Set up cursor
         glfwSetInputMode(pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Enabling features
         glEnable(GL_DEPTH_TEST);
+
+        glfwWindowHint(GLFW_SAMPLES, 4);
+        glEnable(GL_MULTISAMPLE);
     }
 
     void Engine::render(const Scene& scene) {
         // Render loop
-        // TODO: Test code
-        Shader shader("../src/shaders/BlinnPhong.vert", "../src/shaders/BlinnPhong.frag");
-
         double lastFrameTime = glfwGetTime();
         double currentFrameTime;
         while (!glfwWindowShouldClose(pWindow)) {
@@ -73,7 +77,7 @@ namespace UltEngine {
             glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            scene.draw(shader);
+            scene.draw();
             glfwSwapBuffers(pWindow);
 
             // Update attributes

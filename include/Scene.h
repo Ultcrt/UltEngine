@@ -26,9 +26,11 @@ namespace UltEngine {
         unsigned loadTexture_(const std::string& path);
 
     public:
+        std::shared_ptr<Shader> pDefaultShader;
+
         void load(const std::string& path);
 
-        void draw(const Shader& shader) const;
+        void draw() const;
 
         void setCamera(const std::shared_ptr<Camera>& pCamera);
     };

@@ -37,4 +37,4 @@ cmake-build-debug/
 build/
 /.vs
 /CMakeSettings.json
-/resources/backpack
+/resources/

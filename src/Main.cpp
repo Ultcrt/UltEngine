@@ -10,10 +10,10 @@ int main()
     pEngine->inputObservable.add(pCamera);
 
     UltEngine::Scene scene;
-
+    scene.pDefaultShader = pEngine->pDefaultShader;
     scene.setCamera(pCamera);
 
-    scene.load("../resources/backpack/backpack.obj");
+    scene.load(PROJECT_SOURCE_DIR + std::string("/resources/backpack/backpack.obj"));
 
     pEngine->render(scene);
 

@@ -7,7 +7,7 @@
 
 #include <vector>
 #include "Data.h"
-#include "Shader.h"
+#include "Material.h"
 #include "TransformationNode.h"
 
 namespace UltEngine {
@@ -17,17 +17,18 @@ namespace UltEngine {
         std::vector<vec3u> triangles;
         std::vector<vec2u> lines;
         std::vector<unsigned> points;
-        std::vector<Texture> textures;
+
+        std::shared_ptr<Material> pMaterial;
 
         unsigned VAO = 0;
         unsigned VBO = 0;
         unsigned EBO = 0;
 
-        Mesh(const std::vector<Vertex>& vertices, const std::vector<vec3u>& triangles, const std::vector<vec2u>& lines, const std::vector<unsigned>& points, const std::vector<Texture>& textures);
+        Mesh(const std::vector<Vertex>& vertices, const std::vector<vec3u>& triangles, const std::vector<vec2u>& lines, const std::vector<unsigned>& points, const std::shared_ptr<Material>& pMaterial);
 
         void upload();
 
-        void draw(const Shader& shader) const;
+        void draw(const glm::mat4& view, const glm::mat4& projection) const;
     };
 } // UltEngine
 

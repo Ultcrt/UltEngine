@@ -10,6 +10,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "glad/glad.h"
+#include <iostream>
 
 namespace UltEngine {
     void Scene::load(const std::string &path) {
@@ -91,12 +92,18 @@ namespace UltEngine {
 
         // Load materials
         const aiMaterial* pMaterial = pScene->mMaterials[pMesh->mMaterialIndex];
+
+        for (int i = 0; i < pMaterial->mNumProperties; i++) {
+            auto pProp = pMaterial->mProperties[i];
+        }
+
         std::vector<Texture> diffuseTextures = loadMaterial_(pMaterial, aiTextureType_DIFFUSE, dir);
         std::vector<Texture> specularTextures = loadMaterial_(pMaterial, aiTextureType_SPECULAR, dir);
         textures.insert(textures.end(), diffuseTextures.begin(), diffuseTextures.end());
         textures.insert(textures.end(), specularTextures.begin(), specularTextures.end());
+        auto pMat = std::make_shared<Material>(textures, pDefaultShader);
 
-        return { vertices, triangles, lines, points, textures };
+        return { vertices, triangles, lines, points, pMat };
     }
 
     std::vector<Texture> Scene::loadMaterial_(const aiMaterial* pMaterial, aiTextureType type, const std::string& dir) {
@@ -160,15 +167,9 @@ namespace UltEngine {
         return textureIDs_[absolute];
     }
 
-    void Scene::draw(const Shader &shader) const {
-        shader.use();
-
-        shader.set("projection", pCamera_->getProjection());
-        shader.set("view", pCamera_->getView());
-        shader.set("model", glm::mat4(1.0f));
-
+    void Scene::draw() const {
         for (const Mesh& mesh: meshes_) {
-            mesh.draw(shader);
+            mesh.draw(pCamera_->getView(), pCamera_->getProjection());
         }
     }
 
