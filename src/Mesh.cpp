@@ -66,6 +66,7 @@ namespace UltEngine {
                     std::cerr << std::format("Unsupported texture type {}", textures[i].type);
                     break;
             }
+            glBindTexture(GL_TEXTURE_2D, textures[i].id);
 
             shader.set(std::string("material.").append(name).append(number), static_cast<int>(i));
         }
