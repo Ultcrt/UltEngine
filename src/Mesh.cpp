@@ -73,7 +73,7 @@ namespace UltEngine {
         glActiveTexture(GL_TEXTURE0);
 
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, static_cast<int>(triangles.size()), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(triangles.size()) * 3, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 } // UltEngine
