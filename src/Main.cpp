@@ -7,7 +7,7 @@ int main()
     auto pEngine = std::make_shared<UltEngine::Engine>();
     auto pCamera = std::make_shared<UltEngine::Camera>();
 
-    pEngine->inputObservable.add(pCamera);
+    pEngine->onBeforeRenderObservable.add(pCamera);
 
     UltEngine::Scene scene;
     scene.pDefaultShader = pEngine->pDefaultShader;

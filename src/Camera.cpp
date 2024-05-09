@@ -48,6 +48,10 @@ namespace UltEngine {
         auto* pEngine = reinterpret_cast<Engine*>(glfwGetWindowUserPointer(pWindow));
         double deltaTime = pEngine->deltaTime;
 
+        // Update projection when aspect changed
+        glm::vec2 currentWinSize = pEngine->getSize();
+        aspect = currentWinSize.x / currentWinSize.y;
+
         // Moving
         auto moveOffset = static_cast<float>(deltaTime * moveSpeed);
         glm::vec3 front = transformation_ * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);

@@ -16,7 +16,7 @@ namespace UltEngine {
 		virtual void update(Args... args) = 0;
 	};
 
-    typedef Observer<GLFWwindow*> InputObserver;
+    typedef Observer<GLFWwindow*> RenderObserver;
 } // UltEngine
 
 #endif //ULTENGINE_OBSERVER_H

@@ -26,7 +26,7 @@ namespace UltEngine {
         std::shared_ptr<Shader> pScreenShader_;
 
     public:
-        Observable<GLFWwindow*> inputObservable;
+        Observable<GLFWwindow*> onBeforeRenderObservable;
 
         std::shared_ptr<Shader> pDefaultShader;
 
@@ -38,6 +38,9 @@ namespace UltEngine {
         void render(const Scene& scene);
 
         GLFWwindow* pWindow = nullptr;
+
+        glm::vec2 getSize();
+        void setSize(int w, int h);
     };
 } // UltEngine
 

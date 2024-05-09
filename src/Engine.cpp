@@ -83,17 +83,7 @@ namespace UltEngine {
         glfwSetFramebufferSizeCallback(pWindow, [](GLFWwindow* pWin, int w, int h){
             auto* pEngine = reinterpret_cast<Engine*>(glfwGetWindowUserPointer(pWin));
 
-            // Update view port
-            glViewport(0, 0, w, h);
-
-            // Update first pass frame buffer
-            glBindTexture(GL_TEXTURE_2D, pEngine->cto_);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            glBindRenderbuffer(GL_RENDERBUFFER, pEngine->rbo_);
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
-            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+            pEngine->setSize(w, h);
         });
 
         // Set up scroll callback
@@ -129,7 +119,7 @@ namespace UltEngine {
                 glfwSetWindowShouldClose(pWindow, true);
 
             // Notify other input observers
-            inputObservable.notifyAll(pWindow);
+            onBeforeRenderObservable.notifyAll(pWindow);
 
             // First pass
             glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
@@ -156,6 +146,27 @@ namespace UltEngine {
             // GLFW event
             glfwPollEvents();
         }
+    }
+
+    glm::vec2 Engine::getSize() {
+        return { width_, height_ };
+    }
+
+    void Engine::setSize(int w, int h) {
+        // Update engine info
+        width_ = w;
+        height_ = h;
+
+        // Update first pass frame buffer
+        glBindTexture(GL_TEXTURE_2D, cto_);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+        // Update view port (second pass)
+        glViewport(0, 0, w, h);
     }
 
     Engine::~Engine() {
