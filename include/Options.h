@@ -19,7 +19,7 @@ namespace UltEngine {
         struct CameraOptions {
             // Space options
             float fov    = glm::radians(45.0f);
-            float aspect = 640 / 360;
+            float aspect = 640.0f / 360.0f;
             float near   = 0.1f;
             float far    = 100.0f;
 

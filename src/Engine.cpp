@@ -105,8 +105,6 @@ namespace UltEngine {
         glEnable(GL_MULTISAMPLE);
 
         glEnable(GL_FRAMEBUFFER_SRGB);
-
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
     void Engine::render(const Scene& scene) {
@@ -128,6 +126,7 @@ namespace UltEngine {
             // First pass
             glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
             glEnable(GL_DEPTH_TEST);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.draw();
@@ -135,6 +134,7 @@ namespace UltEngine {
             // Second pass
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glDisable(GL_DEPTH_TEST);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             pScreenShader_->use();
             glBindVertexArray(vao_);
             glBindTexture(GL_TEXTURE_2D, cto_);
