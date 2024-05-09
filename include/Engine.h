@@ -17,6 +17,14 @@ namespace UltEngine {
         int width_;
         int height_;
 
+        unsigned vao_;
+        unsigned vbo_;
+        unsigned fbo_;
+        unsigned cto_;
+        unsigned rbo_;
+
+        std::shared_ptr<Shader> pScreenShader_;
+
     public:
         Observable<GLFWwindow*> inputObservable;
 

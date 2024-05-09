@@ -20,15 +20,16 @@ namespace UltEngine {
 
         std::shared_ptr<Material> pMaterial;
 
-        unsigned VAO = 0;
-        unsigned VBO = 0;
-        unsigned EBO = 0;
-
         Mesh(const std::vector<Vertex>& vertices, const std::vector<vec3u>& triangles, const std::vector<vec2u>& lines, const std::vector<unsigned>& points, const std::shared_ptr<Material>& pMaterial);
 
         void upload();
 
         void draw(const glm::mat4& view, const glm::mat4& projection) const;
+
+    private:
+        unsigned vao_ = 0;
+        unsigned vbo_ = 0;
+        unsigned ebo_ = 0;
     };
 } // UltEngine
 

@@ -3,6 +3,7 @@
 //
 
 #include <stdexcept>
+#include <array>
 #include "Engine.h"
 #include "Shader.h"
 
@@ -32,9 +33,67 @@ namespace UltEngine {
         // Bind Engine to GLFWwindow object
         glfwSetWindowUserPointer(pWindow, this);
 
+        // Initialize first pass frame buffer
+        glGenFramebuffers(1, &fbo_);
+        glGenTextures(1, &cto_);
+        glGenRenderbuffers(1, &rbo_);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+            glBindTexture(GL_TEXTURE_2D, cto_);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cto_, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Initialize screen quad
+        glGenVertexArrays(1, &vao_);
+        glGenBuffers(1, &vbo_);
+        std::array<float, 30> vertices = {
+            -1.0f,  1.0f,     0.0f, 1.0f,
+            -1.0f, -1.0f,     0.0f, 0.0f,
+             1.0f,  1.0f,     1.0f, 1.0f,
+
+             1.0f, -1.0f,     1.0f, 0.0f,
+             1.0f,  1.0f,     1.0f, 1.0f,
+            -1.0f, -1.0f,     0.0f, 0.0f,
+        };
+
+        glBindVertexArray(vao_);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+            glBufferData(GL_ARRAY_BUFFER, static_cast<long>(sizeof(vertices)), &vertices[0], GL_STATIC_DRAW);
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(0));
+
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(2 * sizeof(float)));
+        glBindVertexArray(0);
+
+        // Initialize second pass filler shader
+        pScreenShader_ = std::make_shared<Shader>(PROJECT_SOURCE_DIR + std::string("/src/shaders/ScreenFiller.vert"), PROJECT_SOURCE_DIR + std::string("/src/shaders/ScreenFiller.frag"));
+
         // Set up viewport callback
-        glfwSetFramebufferSizeCallback(pWindow, [](GLFWwindow* win, int w, int h){
+        glfwSetFramebufferSizeCallback(pWindow, [](GLFWwindow* pWin, int w, int h){
+            auto* pEngine = reinterpret_cast<Engine*>(glfwGetWindowUserPointer(pWin));
+
+            // Update view port
             glViewport(0, 0, w, h);
+
+            // Update first pass frame buffer
+            glBindTexture(GL_TEXTURE_2D, pEngine->cto_);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glBindRenderbuffer(GL_RENDERBUFFER, pEngine->rbo_);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
         });
 
         // Set up scroll callback
@@ -49,11 +108,9 @@ namespace UltEngine {
         pDefaultShader = std::make_shared<Shader>(PROJECT_SOURCE_DIR + std::string("/src/shaders/BlinnPhong.vert"), PROJECT_SOURCE_DIR + std::string("/src/shaders/BlinnPhong.frag"));
 
         // Set up cursor
-        glfwSetInputMode(pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //glfwSetInputMode(pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Enabling features
-        glEnable(GL_DEPTH_TEST);
-
         glfwWindowHint(GLFW_SAMPLES, 4);
         glEnable(GL_MULTISAMPLE);
     }
@@ -62,6 +119,7 @@ namespace UltEngine {
         // Render loop
         double lastFrameTime = glfwGetTime();
         double currentFrameTime;
+
         while (!glfwWindowShouldClose(pWindow)) {
             currentFrameTime = glfwGetTime();
             deltaTime = currentFrameTime - lastFrameTime;
@@ -73,11 +131,22 @@ namespace UltEngine {
             // Notify other input observers
             inputObservable.notifyAll(pWindow);
 
-            // Clear up color
+            // First pass
+            glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+            glEnable(GL_DEPTH_TEST);
             glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
             scene.draw();
+
+            // Second pass
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glDisable(GL_DEPTH_TEST);
+            pScreenShader_->use();
+            glBindVertexArray(vao_);
+            glBindTexture(GL_TEXTURE_2D, cto_);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+
+            // Update glfw window frame buffer
             glfwSwapBuffers(pWindow);
 
             // Update attributes
