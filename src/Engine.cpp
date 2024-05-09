@@ -103,6 +103,10 @@ namespace UltEngine {
         // Enabling features
         glfwWindowHint(GLFW_SAMPLES, 4);
         glEnable(GL_MULTISAMPLE);
+
+        glEnable(GL_FRAMEBUFFER_SRGB);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
     void Engine::render(const Scene& scene) {
