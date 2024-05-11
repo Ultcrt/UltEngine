@@ -141,6 +141,7 @@ namespace UltEngine {
             glBindVertexArray(vao_);
             glBindTexture(GL_TEXTURE_2D, cto_);
             glDrawArrays(GL_TRIANGLES, 0, 6);
+            glBindTexture(GL_TEXTURE_2D, 0);
 
             // Update glfw window frame buffer
             glfwSwapBuffers(pWindow);

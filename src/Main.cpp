@@ -14,17 +14,19 @@ int main()
             glm::vec3{1.0f, 0.0f, 0.0f},
             glm::vec3{0.1f, 0.0f, 0.0f});
 
+    pCamera->translation = glm::vec3(0.0f, 0.0f, 2.0f);
+
     pPointLight->translation = {3.0f, 3.0f, 3.0f};
 
     auto pDirectionalLight = std::make_shared<UltEngine::DirectionalLight>(
-            glm::vec3{1.0f, 0.0f, 0.0f},
-            glm::vec3{1.0f, 0.0f, 0.0f},
-            glm::vec3{0.1f, 0.0f, 0.0f});
+            glm::vec3{0.0f, 1.0f, 0.0f},
+            glm::vec3{0.0f, 1.0f, 0.0f},
+            glm::vec3{0.0f, 0.1f, 0.0f});
 
     auto pSpotLight = std::make_shared<UltEngine::SpotLight>(
-            glm::vec3{1.0f, 0.0f, 0.0f},
-            glm::vec3{1.0f, 0.0f, 0.0f},
-            glm::vec3{0.1f, 0.0f, 0.0f});
+            glm::vec3{0.0f, 0.0f, 1.0f},
+            glm::vec3{0.0f, 0.0f, 1.0f},
+            glm::vec3{0.0f, 0.0f, 0.1f});
 
     pEngine->onBeforeRenderObservable.add(pCamera);
 

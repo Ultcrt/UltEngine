@@ -171,33 +171,41 @@ namespace UltEngine {
         for (const Mesh& mesh: meshes_) {
             const auto& pShader = mesh.pMaterial->pShader;
 
+            // Use shader program
+            pShader->use();
+
             // Set camera params
             const auto& view = pCamera_->getView();
             const auto& projection = pCamera_->getProjection();
+            const auto t = glm::inverse(view);
             pShader->set("view", view);
             pShader->set("projection", projection);
-            pShader->set("viewPosition", -glm::vec3(view[3]));
+            pShader->set("viewPosition", pCamera_->translation);
 
             // Set up lights
-            std::size_t pointLightIdx = 0;
-            std::size_t directionalLightIdx = 0;
-            std::size_t spotLightIdx = 0;
+            std::size_t pointLightNum = 0;
+            std::size_t directionalLightNum = 0;
+            std::size_t spotLightNum = 0;
             for (const auto& pLight: pLights_) {
                 std::size_t idx = 0;
                 switch (pLight->type()) {
                     case LightType::PointLight:
-                        idx = pointLightIdx++;
+                        idx = pointLightNum++;
                         break;
                     case LightType::DirectionalLight:
-                        idx = directionalLightIdx++;
+                        idx = directionalLightNum++;
                         break;
                     case LightType::SpotLight:
-                        idx = spotLightIdx++;
+                        idx = spotLightNum++;
                         break;
                 }
                 pLight->prepare(idx, *pShader);
             }
+            pShader->set("pointLightNum", static_cast<int>(pointLightNum));
+            pShader->set("directionalLightNum", static_cast<int>(directionalLightNum));
+            pShader->set("spotLightNum", static_cast<int>(spotLightNum));
 
+            // Set up mesh & material
             mesh.draw();
         }
     }

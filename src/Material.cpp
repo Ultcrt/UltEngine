@@ -10,8 +10,6 @@ namespace UltEngine {
 	Material::Material(const std::vector<Texture>& textures, const std::shared_ptr<Shader>& pShader): textures(textures), pShader(pShader) {}
 
 	void Material::prepare() {
-        pShader->use();
-
         pShader->set("material.shininess", shininess);
 
         unsigned diffuseNum = 0;

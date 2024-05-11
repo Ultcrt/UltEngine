@@ -4,7 +4,7 @@
 #define DIRECTIONAL_LIGHT_MAX_NUM 5
 #define SPOT_LIGHT_MAX_NUM 5
 
-in Input {
+in VertexShaderOut {
     vec3 position;
     vec3 normal;
     vec2 texCoord;
@@ -61,6 +61,10 @@ uniform PointLight pointLights[POINT_LIGHT_MAX_NUM];
 uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHT_MAX_NUM];
 uniform SpotLight spotLights[SPOT_LIGHT_MAX_NUM];
 
+uniform int pointLightNum;
+uniform int directionalLightNum;
+uniform int spotLightNum;
+
 vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir);
 vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir);
 vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir);
@@ -70,13 +74,13 @@ void main() {
     vec3 viewDir = normalize(viewPosition - input.position);
 
     vec3 finalColor = vec3(0.0f);
-    for (int i = 0; i < POINT_LIGHT_MAX_NUM; i++) {
+    for (int i = 0; i < pointLightNum; i++) {
         finalColor += CalculatePointLightShading(pointLights[i], input.position, input.normal, color, viewDir);
     }
-    for (int i = 0; i < DIRECTIONAL_LIGHT_MAX_NUM; i++) {
+    for (int i = 0; i < directionalLightNum; i++) {
         finalColor += CalculateDirectionalLightShading(directionalLights[i], input.position, input.normal, color, viewDir);
     }
-    for (int i = 0; i < SPOT_LIGHT_MAX_NUM; i++) {
+    for (int i = 0; i < spotLightNum; i++) {
         finalColor += CalculateSpotLightShading(spotLights[i], input.position, input.normal, color, viewDir);
     }
 
