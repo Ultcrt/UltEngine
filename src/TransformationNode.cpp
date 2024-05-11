@@ -23,4 +23,23 @@ namespace UltEngine {
     TransformationNode::TransformationNode(): scaling(glm::vec3(1.0f)), rotation(glm::vec3(0.0f)), translation(glm::vec3(0.0f)) {
         updateTransformation();
     }
+
+    void TransformationNode::setRotationWithDirection(const glm::vec3 &direction, const glm::vec3 &up) {
+        const glm::vec3 worldZ = glm::vec3{0.0f, 0.0f, 1.0f};
+        const glm::vec3 worldY = glm::vec3{0.0f, 1.0f, 0.0f};
+
+        glm::vec3 upVec = up;
+        if (glm::length(upVec) == 0.0f) {
+            upVec = direction == worldY ? worldZ : worldY;
+        }
+        const glm::vec3 normalizedDirection = glm::normalize(direction);
+
+        const glm::vec3 axisX = glm::normalize(glm::cross(direction, upVec));
+        const glm::vec3 axisZ = -normalizedDirection;
+        const glm::vec3 axisY = glm::normalize(glm::cross(axisX, axisZ));
+
+        rotation = glm::eulerAngles(glm::quat(glm::mat3(axisX, axisY, axisZ)));
+
+        updateTransformation();
+    }
 } // UltEngine

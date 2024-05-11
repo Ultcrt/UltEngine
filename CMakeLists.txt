@@ -32,7 +32,15 @@ add_executable(engine
         include/Observable.h
         include/Observer.h
         include/Material.h
-        src/Material.cpp)
+        src/Material.cpp
+        src/ILight.cpp
+        include/ILight.h
+        src/PointLight.cpp
+        include/PointLight.h
+        src/DirectionalLight.cpp
+        include/DirectionalLight.h
+        src/SpotLight.cpp
+        include/SpotLight.h)
 
 target_compile_definitions(engine PRIVATE PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 

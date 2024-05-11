@@ -42,10 +42,8 @@ namespace UltEngine {
         glBindVertexArray(0);
     }
 
-    void Mesh::draw(const glm::mat4& view, const glm::mat4& projection) const {
+    void Mesh::draw() const {
         pMaterial->pShader->set("model", transformation_);
-        pMaterial->pShader->set("view", view);
-        pMaterial->pShader->set("projection", projection);
 
         pMaterial->prepare();
 

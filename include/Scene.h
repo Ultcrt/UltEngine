@@ -12,13 +12,16 @@
 #include "Mesh.h"
 #include "Data.h"
 #include "Camera.h"
+#include "ILight.h"
 
 namespace UltEngine {
     class Scene {
     private:
         std::vector<Mesh> meshes_;
         std::unordered_map<std::string, unsigned> textureIDs_;
+
         std::shared_ptr<Camera> pCamera_;
+        std::vector<std::shared_ptr<ILight>> pLights_;
 
         void loadNode_(const aiNode* pNode, const aiScene* pScene, const std::string& dir);
         Mesh loadMesh_(const aiMesh* pMesh, const aiScene* pScene, const std::string& dir);
@@ -33,6 +36,8 @@ namespace UltEngine {
         void draw() const;
 
         void setCamera(const std::shared_ptr<Camera>& pCamera);
+
+        void addLight(const std::shared_ptr<ILight>& pLight);
     };
 } // UltEngine
 

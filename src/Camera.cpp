@@ -17,6 +17,7 @@ namespace UltEngine {
     moveSpeed(options.moveSpeed),
     rotateSensitivity(options.rotateSensitivity),
     zoomSensitivity(options.zoomSensitivity) {
+        // TODO: Too complicate
         view_ = glm::lookAt(position, target, up);
         projection_ = glm::perspective(fov, aspect, near, far);
 

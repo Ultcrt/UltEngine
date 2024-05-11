@@ -23,6 +23,12 @@ namespace UltEngine {
         unsigned id;
         int type;
     };
+
+    enum class LightType {
+        PointLight,
+        DirectionalLight,
+        SpotLight
+    };
 } // UltEngine
 
 #endif //ULTENGINE_DATA_H

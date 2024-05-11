@@ -169,11 +169,44 @@ namespace UltEngine {
 
     void Scene::draw() const {
         for (const Mesh& mesh: meshes_) {
-            mesh.draw(pCamera_->getView(), pCamera_->getProjection());
+            const auto& pShader = mesh.pMaterial->pShader;
+
+            // Set camera params
+            const auto& view = pCamera_->getView();
+            const auto& projection = pCamera_->getProjection();
+            pShader->set("view", view);
+            pShader->set("projection", projection);
+            pShader->set("viewPosition", -glm::vec3(view[3]));
+
+            // Set up lights
+            std::size_t pointLightIdx = 0;
+            std::size_t directionalLightIdx = 0;
+            std::size_t spotLightIdx = 0;
+            for (const auto& pLight: pLights_) {
+                std::size_t idx = 0;
+                switch (pLight->type()) {
+                    case LightType::PointLight:
+                        idx = pointLightIdx++;
+                        break;
+                    case LightType::DirectionalLight:
+                        idx = directionalLightIdx++;
+                        break;
+                    case LightType::SpotLight:
+                        idx = spotLightIdx++;
+                        break;
+                }
+                pLight->prepare(idx, *pShader);
+            }
+
+            mesh.draw();
         }
     }
 
     void Scene::setCamera(const std::shared_ptr<Camera> &pCamera) {
         pCamera_ = pCamera;
+    }
+
+    void Scene::addLight(const std::shared_ptr<ILight> &pLight) {
+        pLights_.emplace_back(pLight);
     }
 } // UltEngine

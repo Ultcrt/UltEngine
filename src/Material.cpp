@@ -10,6 +10,10 @@ namespace UltEngine {
 	Material::Material(const std::vector<Texture>& textures, const std::shared_ptr<Shader>& pShader): textures(textures), pShader(pShader) {}
 
 	void Material::prepare() {
+        pShader->use();
+
+        pShader->set("material.shininess", shininess);
+
         unsigned diffuseNum = 0;
         unsigned specularNum = 0;
 
@@ -37,7 +41,5 @@ namespace UltEngine {
         }
         // Set texture unit back to default
         glActiveTexture(GL_TEXTURE0);
-
-        pShader->use();
-	}
+    }
 } // UltEngine

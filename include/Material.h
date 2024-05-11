@@ -13,6 +13,8 @@
 namespace UltEngine {
 	class Material {
 	public:
+        float shininess = 32.0f;
+
 		std::vector<Texture> textures;
 
 		Material(const std::vector<Texture>& textures, const std::shared_ptr<Shader>& pShader);

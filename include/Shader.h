@@ -24,6 +24,8 @@ namespace UltEngine {
         void set(const std::string& name, int val) const;
         void set(const std::string& name, bool val) const;
         void set(const std::string& name, float val) const;
+        void set(const std::string& name, const glm::vec3& val) const;
+        void set(const std::string& name, const glm::vec2& val) const;
         void set(const std::string& name, const glm::mat4& val, bool transpose = false) const;
     };
 } // UltEngine

@@ -24,7 +24,7 @@ namespace UltEngine {
 
         void upload();
 
-        void draw(const glm::mat4& view, const glm::mat4& projection) const;
+        void draw() const;
 
     private:
         unsigned vao_ = 0;

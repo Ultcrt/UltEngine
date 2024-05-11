@@ -18,6 +18,8 @@ namespace UltEngine {
 
         TransformationNode(const glm::vec3& scaling, const glm::vec3& rotation, const glm::vec3& translation);
 
+        void setRotationWithDirection(const glm::vec3& direction, const glm::vec3& up = {0.0f, 0.0f, 0.0f});
+
         void updateTransformation();
 
     protected:
