@@ -8,6 +8,7 @@ in VertexShaderOut {
     vec3 position;
     vec3 normal;
     vec2 texCoord;
+    mat3 tbn;
 } input;
 
 out vec4 fragColor;
@@ -51,6 +52,7 @@ struct Material {
     sampler2D specular0;
     sampler2D specular1;
     sampler2D specular2;
+    sampler2D normal;
 
     float shininess;
 };
@@ -72,16 +74,17 @@ vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3
 void main() {
     vec3 color = vec3(texture(material.diffuse0, input.texCoord));
     vec3 viewDir = normalize(viewPosition - input.position);
+    vec3 normal = normalize(input.tbn * vec3(texture(material.normal, input.texCoord)));
 
     vec3 finalColor = vec3(0.0f);
     for (int i = 0; i < pointLightNum; i++) {
-        finalColor += CalculatePointLightShading(pointLights[i], input.position, input.normal, color, viewDir);
+        finalColor += CalculatePointLightShading(pointLights[i], input.position, normal, color, viewDir);
     }
     for (int i = 0; i < directionalLightNum; i++) {
-        finalColor += CalculateDirectionalLightShading(directionalLights[i], input.position, input.normal, color, viewDir);
+        finalColor += CalculateDirectionalLightShading(directionalLights[i], input.position, normal, color, viewDir);
     }
     for (int i = 0; i < spotLightNum; i++) {
-        finalColor += CalculateSpotLightShading(spotLights[i], input.position, input.normal, color, viewDir);
+        finalColor += CalculateSpotLightShading(spotLights[i], input.position, normal, color, viewDir);
     }
 
     fragColor = vec4(finalColor, 1.0f);

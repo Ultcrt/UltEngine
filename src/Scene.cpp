@@ -25,7 +25,7 @@ namespace UltEngine {
         }
 
         Assimp::Importer importer;
-        const aiScene* pScene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+        const aiScene* pScene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
         if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) {
             throw std::runtime_error("Cannot load model file");
@@ -64,6 +64,10 @@ namespace UltEngine {
             vertex.normal.y = pMesh->mNormals[i].y;
             vertex.normal.z = pMesh->mNormals[i].z;
 
+            vertex.tangent.x = pMesh->mTangents[i].x;
+            vertex.tangent.y = pMesh->mTangents[i].y;
+            vertex.tangent.z = pMesh->mTangents[i].z;
+
             // Texture coordinate can be empty
             if (pMesh->mTextureCoords[0]) {
                 vertex.texCoord.x = pMesh->mTextureCoords[0][i].x;
@@ -97,10 +101,12 @@ namespace UltEngine {
             auto pProp = pMaterial->mProperties[i];
         }
 
-        std::vector<Texture> diffuseTextures = loadMaterial_(pMaterial, aiTextureType_DIFFUSE, dir);
+        std::vector<Texture> diffuseTextures  = loadMaterial_(pMaterial, aiTextureType_DIFFUSE, dir);
         std::vector<Texture> specularTextures = loadMaterial_(pMaterial, aiTextureType_SPECULAR, dir);
+        std::vector<Texture> normalTextures   = loadMaterial_(pMaterial, aiTextureType_HEIGHT, dir);
         textures.insert(textures.end(), diffuseTextures.begin(), diffuseTextures.end());
         textures.insert(textures.end(), specularTextures.begin(), specularTextures.end());
+        textures.insert(textures.end(), normalTextures.begin(), normalTextures.end());
         auto pMat = std::make_shared<Material>(textures, pDefaultShader);
 
         return { vertices, triangles, lines, points, pMat };

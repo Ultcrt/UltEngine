@@ -29,6 +29,10 @@ namespace UltEngine {
                 name = "specular";
                 number = std::to_string(specularNum++);
                 break;
+            case aiTextureType_HEIGHT:
+                name = "normal";
+                number = "";
+                break;
             default:
                 std::cerr << std::format("Unsupported texture type {}", textures[i].type);
                 break;
