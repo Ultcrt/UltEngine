@@ -47,7 +47,9 @@ add_executable(engine
         src/CubicEnvironment.cpp
         include/CubicEnvironment.h
         src/Texture.cpp
-        include/Texture.h)
+        include/Texture.h
+        src/PostProcessing.cpp
+        include/PostProcessing.h)
 
 target_compile_definitions(engine PRIVATE PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
