@@ -74,7 +74,7 @@ vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3
 void main() {
     vec3 color = vec3(texture(material.diffuse0, input.texCoord));
     vec3 viewDir = normalize(viewPosition - input.position);
-    vec3 normal = normalize(input.tbn * vec3(texture(material.normal, input.texCoord)));
+    vec3 normal = normalize(input.tbn * (vec3(texture(material.normal, input.texCoord)) * 2.0f - 1.0f));
 
     vec3 finalColor = vec3(0.0f);
     for (int i = 0; i < pointLightNum; i++) {
@@ -104,7 +104,7 @@ vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, ve
 }
 
 vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir) {
-    vec3 lightDir = light.direction;
+    vec3 lightDir = -light.direction;
     vec3 halfVec  = normalize(lightDir + viewDir);
 
     vec3 ambient  = light.ambient * color;
@@ -115,7 +115,7 @@ vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec
 }
 
 vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir) {
-    vec3  lightDir    = light.direction;
+    vec3  lightDir    = -light.direction;
     vec3  halfVec     = normalize(lightDir + viewDir);
     float distance    = length(light.position - position);
     float theta       = dot(normalize(position - light.position), light.direction);
