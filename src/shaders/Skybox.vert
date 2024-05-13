@@ -9,4 +9,7 @@ uniform mat4 projection;
 void main() {
 	texCoord = position;
 	gl_Position = projection * vec4(view * position, 1.0f);
+
+	// Make skybox depth farest
+	gl_Position.z = gl_Position.w;
 }

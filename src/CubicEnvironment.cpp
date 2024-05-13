@@ -90,10 +90,10 @@ namespace UltEngine {
         shader_.set("skybox", 0);
 
         // Draw
-        glDisable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
         glBindVertexArray(vao_);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
     }
 
     Shader *CubicEnvironment::getShader() {

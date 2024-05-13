@@ -149,20 +149,6 @@ namespace UltEngine {
     }
 
     void Scene::draw() const {
-        const auto& pEnvironmentShader = pEnvironment_->getShader();
-
-        // Use shader program
-        pEnvironmentShader->use();
-
-        // Set camera params
-        const auto& view = pCamera_->getView();
-        const auto& projection = pCamera_->getProjection();
-        pEnvironmentShader->set("view", glm::mat3(view));
-        pEnvironmentShader->set("projection", projection);
-
-        // Set environment
-        pEnvironment_->draw();
-
         for (const Mesh& mesh: meshes_) {
             const auto& pShader = mesh.pMaterial->pShader;
 
@@ -203,6 +189,17 @@ namespace UltEngine {
             // Set up mesh & material
             mesh.draw();
         }
+
+        // Draw environment
+        const auto& pEnvironmentShader = pEnvironment_->getShader();
+        pEnvironmentShader->use();
+        // Set camera params
+        const auto& view = pCamera_->getView();
+        const auto& projection = pCamera_->getProjection();
+        pEnvironmentShader->set("view", glm::mat3(view));
+        pEnvironmentShader->set("projection", projection);
+        // Set environment
+        pEnvironment_->draw();
     }
 
     void Scene::setCamera(const std::shared_ptr<Camera> &pCamera) {
