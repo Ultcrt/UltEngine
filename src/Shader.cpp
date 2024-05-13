@@ -93,4 +93,8 @@ namespace UltEngine {
     void Shader::set(const std::string &name, const glm::mat4 &val, bool transpose) const {
         glUniformMatrix4fv(glGetUniformLocation(programID, name.c_str()), 1, transpose, glm::value_ptr(val));
     }
+
+    void Shader::set(const std::string &name, const glm::mat3 &val, bool transpose) const {
+        glUniformMatrix3fv(glGetUniformLocation(programID, name.c_str()), 1, transpose, glm::value_ptr(val));
+    }
 } // UltEngine

@@ -157,7 +157,7 @@ namespace UltEngine {
         // Set camera params
         const auto& view = pCamera_->getView();
         const auto& projection = pCamera_->getProjection();
-        pEnvironmentShader->set("view", view);
+        pEnvironmentShader->set("view", glm::mat3(view));
         pEnvironmentShader->set("projection", projection);
 
         // Set environment
