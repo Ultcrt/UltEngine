@@ -67,30 +67,31 @@ uniform int pointLightNum;
 uniform int directionalLightNum;
 uniform int spotLightNum;
 
-vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir);
-vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir);
-vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir);
+vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, vec3 viewDir);
+vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, vec3 viewDir);
+vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, vec3 viewDir);
 
 void main() {
     vec3 color = vec3(texture(material.diffuse0, input.texCoord));
     vec3 viewDir = normalize(viewPosition - input.position);
     vec3 normal = normalize(input.tbn * (vec3(texture(material.normal, input.texCoord)) * 2.0f - 1.0f));
+    float specularIntensity = texture(material.specular0, input.texCoord).r;
 
     vec3 finalColor = vec3(0.0f);
     for (int i = 0; i < pointLightNum; i++) {
-        finalColor += CalculatePointLightShading(pointLights[i], input.position, normal, color, viewDir);
+        finalColor += CalculatePointLightShading(pointLights[i], input.position, normal, color, specularIntensity, viewDir);
     }
     for (int i = 0; i < directionalLightNum; i++) {
-        finalColor += CalculateDirectionalLightShading(directionalLights[i], input.position, normal, color, viewDir);
+        finalColor += CalculateDirectionalLightShading(directionalLights[i], input.position, normal, color, specularIntensity, viewDir);
     }
     for (int i = 0; i < spotLightNum; i++) {
-        finalColor += CalculateSpotLightShading(spotLights[i], input.position, normal, color, viewDir);
+        finalColor += CalculateSpotLightShading(spotLights[i], input.position, normal, color, specularIntensity, viewDir);
     }
 
     fragColor = vec4(finalColor, 1.0f);
 }
 
-vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir) {
+vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - position);
     vec3 halfVec  = normalize(lightDir + viewDir);
     float distance = length(light.position - position);
@@ -98,23 +99,23 @@ vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, ve
 
     vec3 ambient  = light.ambient * color;
     vec3 diffuse  = light.diffuse * color * max(dot(lightDir, normal), 0.0f);
-    vec3 specular = light.specular * pow(max(dot(halfVec, normal), 0.0f), material.shininess);
+    vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), material.shininess);
 
     return (ambient + diffuse + specular) * attenuation;
 }
 
-vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir) {
+vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, vec3 viewDir) {
     vec3 lightDir = -light.direction;
     vec3 halfVec  = normalize(lightDir + viewDir);
 
     vec3 ambient  = light.ambient * color;
     vec3 diffuse  = light.diffuse * color * max(dot(lightDir, normal), 0.0f);
-    vec3 specular = light.specular * pow(max(dot(halfVec, normal), 0.0f), material.shininess);
+    vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), material.shininess);
 
     return ambient + diffuse + specular;
 }
 
-vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, vec3 viewDir) {
+vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, vec3 viewDir) {
     vec3  lightDir    = -light.direction;
     vec3  halfVec     = normalize(lightDir + viewDir);
     float distance    = length(light.position - position);
@@ -124,7 +125,7 @@ vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3
 
     vec3 ambient  = light.ambient * color;
     vec3 diffuse  = light.diffuse * color * max(dot(lightDir, normal), 0.0f);
-    vec3 specular = light.specular * pow(max(dot(halfVec, normal), 0.0f), material.shininess);
+    vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), material.shininess);
 
     return ambient + (diffuse + specular) * attenuation;
 }
