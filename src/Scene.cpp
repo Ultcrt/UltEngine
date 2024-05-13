@@ -158,23 +158,27 @@ namespace UltEngine {
             glGenTextures(1, &textureID);
             glBindTexture(GL_TEXTURE_2D, textureID);
 
+            GLint internalformat;
             GLenum format;
             switch (channels) {
                 case 1:
+                    internalformat = GL_RED;
                     format = GL_RED;
                     break;
                 case 3:
-                    format = options.srgb ? GL_SRGB : GL_RGB;
+                    internalformat = options.srgb ? GL_SRGB : GL_RGB;
+                    format = GL_RGB;
                     break;
                 case 4:
-                    format = options.srgb ? GL_SRGB_ALPHA : GL_RGBA;
+                    internalformat = options.srgb ? GL_SRGB_ALPHA : GL_RGBA;
+                    format = GL_RGBA;
                     break;
                 default:
                     throw std::runtime_error(std::format("Unexpected texture channels {}", channels));
             }
 
             // Load based on options
-            glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(format), width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
             if (options.generateMipmap) glGenerateMipmap(GL_TEXTURE_2D);
             for (const auto [key, val]: options.params) {
                 glTexParameteri(GL_TEXTURE_2D, key, val);
