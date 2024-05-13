@@ -126,5 +126,5 @@ vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3
     vec3 diffuse  = light.diffuse * color * max(dot(lightDir, normal), 0.0f);
     vec3 specular = light.specular * pow(max(dot(halfVec, normal), 0.0f), material.shininess);
 
-    return (ambient + diffuse + specular) * attenuation;
+    return ambient + (diffuse + specular) * attenuation;
 }
