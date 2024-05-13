@@ -17,11 +17,15 @@ namespace UltEngine {
         int width_;
         int height_;
 
-        unsigned vao_;
-        unsigned vbo_;
-        unsigned fbo_;
-        unsigned cto_;
-        unsigned rbo_;
+        unsigned multiFBO_;
+        unsigned multiCTO_;
+        unsigned multiRBO_;
+
+        unsigned screenVAO_;
+        unsigned screenVBO_;
+        unsigned screenFBO_;
+        unsigned screenCTO_;
+        unsigned screenRBO_;
 
         std::shared_ptr<Shader> pScreenShader_;
 

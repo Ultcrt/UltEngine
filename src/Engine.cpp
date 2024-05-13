@@ -34,27 +34,47 @@ namespace UltEngine {
         glfwSetWindowUserPointer(pWindow, this);
 
         // Initialize first pass frame buffer
-        glGenFramebuffers(1, &fbo_);
-        glGenTextures(1, &cto_);
-        glGenRenderbuffers(1, &rbo_);
+        glGenFramebuffers(1, &multiFBO_);
+        glGenTextures(1, &multiCTO_);
+        glGenRenderbuffers(1, &multiRBO_);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
-            glBindTexture(GL_TEXTURE_2D, cto_);
+        glBindFramebuffer(GL_FRAMEBUFFER, multiFBO_);
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, multiCTO_);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            // TODO: Fixed sample size
+            glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, width_, height_, GL_TRUE);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, multiCTO_, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glBindRenderbuffer(GL_RENDERBUFFER, multiRBO_);
+            // TODO: Fixed sample size
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width_, height_);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, multiRBO_);
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Initialize two pass blit frame buffer
+        glGenFramebuffers(1, &screenFBO_);
+            glGenTextures(1, &screenCTO_);
+            glGenRenderbuffers(1, &screenRBO_);
+            glBindFramebuffer(GL_FRAMEBUFFER, screenFBO_);
+            glBindTexture(GL_TEXTURE_2D, screenCTO_);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cto_, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenCTO_, 0);
             glBindTexture(GL_TEXTURE_2D, 0);
 
-            glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
+            glBindRenderbuffer(GL_RENDERBUFFER, screenRBO_);
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, screenRBO_);
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Initialize screen quad
-        glGenVertexArrays(1, &vao_);
-        glGenBuffers(1, &vbo_);
+        glGenVertexArrays(1, &screenVAO_);
+        glGenBuffers(1, &screenVBO_);
         std::array<float, 30> vertices = {
             -1.0f,  1.0f,     0.0f, 1.0f,
             -1.0f, -1.0f,     0.0f, 0.0f,
@@ -65,8 +85,8 @@ namespace UltEngine {
             -1.0f, -1.0f,     0.0f, 0.0f,
         };
 
-        glBindVertexArray(vao_);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+        glBindVertexArray(screenVAO_);
+            glBindBuffer(GL_ARRAY_BUFFER, screenVBO_);
             glBufferData(GL_ARRAY_BUFFER, static_cast<long>(sizeof(vertices)), &vertices[0], GL_STATIC_DRAW);
 
             glEnableVertexAttribArray(0);
@@ -126,20 +146,25 @@ namespace UltEngine {
             onBeforeRenderObservable.notifyAll(pWindow);
 
             // First pass
-            glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+            glBindFramebuffer(GL_FRAMEBUFFER, multiFBO_);
             glEnable(GL_DEPTH_TEST);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.draw();
 
+            // Blit frame buffer
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, multiFBO_);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, screenFBO_);
+            glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
             // Second pass
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glDisable(GL_DEPTH_TEST);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             pScreenShader_->use();
-            glBindVertexArray(vao_);
-            glBindTexture(GL_TEXTURE_2D, cto_);
+            glBindVertexArray(screenVAO_);
+            glBindTexture(GL_TEXTURE_2D, screenCTO_);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -165,10 +190,20 @@ namespace UltEngine {
         height_ = h;
 
         // Update first pass frame buffer
-        glBindTexture(GL_TEXTURE_2D, cto_);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, multiCTO_);
+        // TODO: Fixed sample size
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, width_, height_, GL_TRUE);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindRenderbuffer(GL_RENDERBUFFER, multiRBO_);
+        // TODO: Fixed sample size
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width_, height_);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+        // Update blit frame buffer
+        glBindTexture(GL_TEXTURE_2D, screenCTO_);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         glBindTexture(GL_TEXTURE_2D, 0);
-        glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
+        glBindRenderbuffer(GL_RENDERBUFFER, screenRBO_);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
 

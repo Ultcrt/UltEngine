@@ -17,9 +17,9 @@ namespace UltEngine {
         // TODO: Multiple environment using multiple shader object right now
         Shader shader_;
 
-        unsigned cto_;
-        unsigned vao_;
-        unsigned vbo_;
+        unsigned multiCTO_;
+        unsigned screenVAO_;
+        unsigned screenVBO_;
 
         std::array<Texture, 6> textures_;
 

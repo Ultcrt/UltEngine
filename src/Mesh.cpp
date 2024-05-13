@@ -11,8 +11,8 @@
 namespace UltEngine {
     Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<vec3u>& triangles, const std::vector<vec2u>& lines, const std::vector<unsigned>& points, const std::shared_ptr<Material>& pMaterial): vertices(vertices), triangles(triangles), lines(lines), points(points), pMaterial(pMaterial) {
         // Create objects (should not be done in update, because otherwise OpenGL would create multiple redundant objects)
-        glGenVertexArrays(1, &vao_);
-        glGenBuffers(1, &vbo_);
+        glGenVertexArrays(1, &screenVAO_);
+        glGenBuffers(1, &screenVBO_);
         glGenBuffers(1, &ebo_);
 
         // Upload to GPU
@@ -20,9 +20,9 @@ namespace UltEngine {
     }
 
     void Mesh::upload() {
-        glBindVertexArray(vao_);
+        glBindVertexArray(screenVAO_);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+        glBindBuffer(GL_ARRAY_BUFFER, screenVBO_);
         glBufferData(GL_ARRAY_BUFFER, static_cast<long>(vertices.size() * sizeof(Vertex)), &vertices[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
@@ -50,7 +50,7 @@ namespace UltEngine {
 
         pMaterial->prepare();
 
-        glBindVertexArray(vao_);
+        glBindVertexArray(screenVAO_);
         glDrawElements(GL_TRIANGLES, static_cast<int>(triangles.size()) * 3, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }

@@ -27,8 +27,8 @@ namespace UltEngine {
         void draw() const;
 
     private:
-        unsigned vao_ = 0;
-        unsigned vbo_ = 0;
+        unsigned screenVAO_ = 0;
+        unsigned screenVBO_ = 0;
         unsigned ebo_ = 0;
     };
 } // UltEngine
