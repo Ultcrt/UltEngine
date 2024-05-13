@@ -18,7 +18,7 @@ namespace UltEngine {
 
         explicit ILight(const glm::vec3& diffuse, const glm::vec3& specular, const glm::vec3& ambient);
 
-        virtual std::string signature();
+        std::string signature();
 
         virtual LightType type() = 0;
 

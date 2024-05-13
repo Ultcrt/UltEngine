@@ -4,6 +4,7 @@
 #include "PointLight.h"
 #include "DirectionalLight.h"
 #include "SpotLight.h"
+#include "CubicEnvironment.h"
 
 int main()
 {
@@ -28,11 +29,22 @@ int main()
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{0.1f, 0.1f, 0.1f});
 
+    const std::string envDir = PROJECT_SOURCE_DIR + std::string("/resources/skybox/");
+    auto pEnvironment = std::make_shared<UltEngine::CubicEnvironment>(std::array<std::string, 6>{
+        envDir + "right.jpg",
+        envDir + "left.jpg",
+        envDir + "top.jpg",
+        envDir + "bottom.jpg",
+        envDir + "front.jpg",
+        envDir + "back.jpg"
+    });
+
     pEngine->onBeforeRenderObservable.add(pCamera);
 
     UltEngine::Scene scene;
     scene.pDefaultShader = pEngine->pDefaultShader;
     scene.setCamera(pCamera);
+    scene.setEnvironment(pEnvironment);
     scene.addLight(pPointLight);
     scene.addLight(pDirectionalLight);
     scene.addLight(pSpotLight);

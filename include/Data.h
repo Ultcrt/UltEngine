@@ -20,11 +20,6 @@ namespace UltEngine {
         glm::vec2 texCoord = {0.0f, 0.0f };
     };
 
-    struct Texture {
-        unsigned id;
-        int type;
-    };
-
     enum class LightType {
         PointLight,
         DirectionalLight,

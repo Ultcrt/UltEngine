@@ -9,6 +9,9 @@ namespace UltEngine {
         TextureOptions TextureOptions::ColorTextureOptions = {
                 true,
                 true,
+                true,
+                GL_TEXTURE_2D,
+                GL_UNSIGNED_BYTE,
                 {
                         {GL_TEXTURE_WRAP_S, GL_REPEAT},
                         {GL_TEXTURE_WRAP_T, GL_REPEAT},
@@ -19,6 +22,9 @@ namespace UltEngine {
         TextureOptions TextureOptions::NonColorTextureOptions = {
                 false,
                 true,
+                true,
+                GL_TEXTURE_2D,
+                GL_UNSIGNED_BYTE,
                 {
                         {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
                         {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},

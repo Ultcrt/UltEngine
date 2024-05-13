@@ -13,6 +13,8 @@
 #include "Data.h"
 #include "Camera.h"
 #include "ILight.h"
+#include "Texture.h"
+#include "IEnvironment.h"
 
 namespace UltEngine {
     class Scene {
@@ -21,12 +23,12 @@ namespace UltEngine {
         std::unordered_map<std::string, unsigned> textureIDs_;
 
         std::shared_ptr<Camera> pCamera_;
+        std::shared_ptr<IEnvironment> pEnvironment_;
         std::vector<std::shared_ptr<ILight>> pLights_;
 
         void loadNode_(const aiNode* pNode, const aiScene* pScene, const std::string& dir);
         Mesh loadMesh_(const aiMesh* pMesh, const aiScene* pScene, const std::string& dir);
         std::vector<Texture> loadTextureGroup_(const aiMaterial* pMaterial, aiTextureType type, const std::string& dir);
-        unsigned int loadTexture_(const std::string &path, const Options::TextureOptions &options);
 
     public:
         std::shared_ptr<Shader> pDefaultShader;
@@ -36,6 +38,8 @@ namespace UltEngine {
         void draw() const;
 
         void setCamera(const std::shared_ptr<Camera>& pCamera);
+
+        void setEnvironment(const std::shared_ptr<IEnvironment>& pEnvironment);
 
         void addLight(const std::shared_ptr<ILight>& pLight);
     };

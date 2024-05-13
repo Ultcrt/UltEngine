@@ -15,11 +15,11 @@ namespace UltEngine {
         static unsigned CreateShaderObjectFromFile_(const std::string& path, GLenum type);
         unsigned vertexShaderID;
         unsigned fragmentShaderID;
-        unsigned programID;
 
     public:
         Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
         void use() const;
+        unsigned programID;
 
         void set(const std::string& name, int val) const;
         void set(const std::string& name, bool val) const;

@@ -23,7 +23,7 @@ namespace UltEngine {
                 signature = "spotLights";
                 break;
             default:
-                throw std::runtime_error("Unknown light type");
+                throw std::runtime_error("Unknown light dataType");
         }
         return signature;
     }

@@ -37,6 +37,9 @@ namespace UltEngine {
 
             bool srgb = false;
             bool generateMipmap = true;
+            bool flipVertically = true;
+            GLenum target = GL_TEXTURE_2D;
+            GLenum dataType = GL_UNSIGNED_BYTE;
             std::unordered_map<GLenum, GLint> params = {};
         };
     } // Options

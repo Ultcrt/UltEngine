@@ -9,6 +9,7 @@
 #include <vector>
 #include "Data.h"
 #include "Shader.h"
+#include "Texture.h"
 
 namespace UltEngine {
 	class Material {

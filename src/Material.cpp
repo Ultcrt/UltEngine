@@ -34,7 +34,7 @@ namespace UltEngine {
                 number = "";
                 break;
             default:
-                std::cerr << std::format("Unsupported texture type {}", textures[i].type);
+                std::cerr << std::format("Unsupported texture type {}", textures[i].type) << std::endl;
                 break;
             }
             glBindTexture(GL_TEXTURE_2D, textures[i].id);

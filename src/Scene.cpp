@@ -2,15 +2,13 @@
 // Created by ultcrt on 24-5-7.
 //
 
+#include <iostream>
 #include <format>
 #include <filesystem>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "Scene.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #include "glad/glad.h"
-#include <iostream>
 
 namespace UltEngine {
     void Scene::load(const std::string &path) {
@@ -126,7 +124,7 @@ namespace UltEngine {
                 break;
             default:
                 options = Options::TextureOptions::NonColorTextureOptions;
-                std::cerr << std::format("Unknown image type {}, load as non-color texture", static_cast<int>(type));
+                std::cerr << std::format("Unknown image dataType {}, load as non-color texture", static_cast<int>(type));
                 break;
         }
         
@@ -135,65 +133,36 @@ namespace UltEngine {
         for (unsigned i = 0; i < pMaterial->GetTextureCount(type); i++) {
             aiString path;
             pMaterial->GetTexture(type, i, &path);
-            textures.emplace_back(loadTexture_(dir + path.C_Str(), options), type);
+
+            // Avoid redundant texture loading
+            const std::string absolute = std::filesystem::absolute(path.C_Str()).generic_string();
+            if (textureIDs_.find(absolute) == textureIDs_.end()) {
+                textures.emplace_back(dir + path.C_Str(), type, options);
+                textureIDs_.insert({absolute, textures.back().id});
+            }
+            else {
+                textures.emplace_back(textureIDs_[absolute], type);
+            }
         }
 
         return textures;
     }
 
-    unsigned int Scene::loadTexture_(const std::string &path, const Options::TextureOptions &options) {
-        const std::string absolute = std::filesystem::absolute(path).generic_string();
-
-        if (textureIDs_.find(absolute) == textureIDs_.end()) {
-            stbi_set_flip_vertically_on_load(true);
-
-            int width, height, channels;
-            unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-
-            if (!data) {
-                throw std::runtime_error(std::format("Cannot load texture '{}'", path));
-            }
-
-            unsigned textureID;
-            glGenTextures(1, &textureID);
-            glBindTexture(GL_TEXTURE_2D, textureID);
-
-            GLint internalformat;
-            GLenum format;
-            switch (channels) {
-                case 1:
-                    internalformat = GL_RED;
-                    format = GL_RED;
-                    break;
-                case 3:
-                    internalformat = options.srgb ? GL_SRGB : GL_RGB;
-                    format = GL_RGB;
-                    break;
-                case 4:
-                    internalformat = options.srgb ? GL_SRGB_ALPHA : GL_RGBA;
-                    format = GL_RGBA;
-                    break;
-                default:
-                    throw std::runtime_error(std::format("Unexpected texture channels {}", channels));
-            }
-
-            // Load based on options
-            glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-            if (options.generateMipmap) glGenerateMipmap(GL_TEXTURE_2D);
-            for (const auto [key, val]: options.params) {
-                glTexParameteri(GL_TEXTURE_2D, key, val);
-            }
-
-            // Free up memory
-            stbi_image_free(data);
-
-            textureIDs_.insert({absolute, textureID});
-        }
-
-        return textureIDs_[absolute];
-    }
-
     void Scene::draw() const {
+        const auto& pEnvironmentShader = pEnvironment_->getShader();
+
+        // Use shader program
+        pEnvironmentShader->use();
+
+        // Set camera params
+        const auto& view = pCamera_->getView();
+        const auto& projection = pCamera_->getProjection();
+        pEnvironmentShader->set("view", view);
+        pEnvironmentShader->set("projection", projection);
+
+        // Set environment
+        pEnvironment_->draw();
+
         for (const Mesh& mesh: meshes_) {
             const auto& pShader = mesh.pMaterial->pShader;
 
@@ -242,5 +211,9 @@ namespace UltEngine {
 
     void Scene::addLight(const std::shared_ptr<ILight> &pLight) {
         pLights_.emplace_back(pLight);
+    }
+
+    void Scene::setEnvironment(const std::shared_ptr<IEnvironment> &pEnvironment) {
+        pEnvironment_ = pEnvironment;
     }
 } // UltEngine
