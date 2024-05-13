@@ -40,7 +40,8 @@ add_executable(engine
         src/DirectionalLight.cpp
         include/DirectionalLight.h
         src/SpotLight.cpp
-        include/SpotLight.h)
+        include/SpotLight.h
+        src/Options.cpp)
 
 target_compile_definitions(engine PRIVATE PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 

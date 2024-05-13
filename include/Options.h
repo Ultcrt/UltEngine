@@ -6,7 +6,9 @@
 #define ULTENGINE_OPTIONS_H
 
 #include <string>
-#include <glm/glm.hpp>
+#include <unordered_map>
+#include "glm/glm.hpp"
+#include "glad/glad.h"
 
 namespace UltEngine {
     namespace Options {
@@ -27,6 +29,15 @@ namespace UltEngine {
             float moveSpeed = 2.5f;
             float rotateSensitivity = 0.5f;
             float zoomSensitivity = 5.0f;
+        };
+
+        struct TextureOptions {
+            static TextureOptions ColorTextureOptions;
+            static TextureOptions NonColorTextureOptions;
+
+            bool srgb = false;
+            bool generateMipmap = true;
+            std::unordered_map<GLenum, GLint> params = {};
         };
     } // Options
 } // UltEngine

@@ -25,8 +25,8 @@ namespace UltEngine {
 
         void loadNode_(const aiNode* pNode, const aiScene* pScene, const std::string& dir);
         Mesh loadMesh_(const aiMesh* pMesh, const aiScene* pScene, const std::string& dir);
-        std::vector<Texture> loadMaterial_(const aiMaterial* pMaterial, aiTextureType type, const std::string& dir);
-        unsigned loadTexture_(const std::string& path);
+        std::vector<Texture> loadTextureGroup_(const aiMaterial* pMaterial, aiTextureType type, const std::string& dir);
+        unsigned int loadTexture_(const std::string &path, const Options::TextureOptions &options);
 
     public:
         std::shared_ptr<Shader> pDefaultShader;

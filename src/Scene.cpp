@@ -101,9 +101,9 @@ namespace UltEngine {
             auto pProp = pMaterial->mProperties[i];
         }
 
-        std::vector<Texture> diffuseTextures  = loadMaterial_(pMaterial, aiTextureType_DIFFUSE, dir);
-        std::vector<Texture> specularTextures = loadMaterial_(pMaterial, aiTextureType_SPECULAR, dir);
-        std::vector<Texture> normalTextures   = loadMaterial_(pMaterial, aiTextureType_HEIGHT, dir);
+        std::vector<Texture> diffuseTextures  = loadTextureGroup_(pMaterial, aiTextureType_DIFFUSE, dir);
+        std::vector<Texture> specularTextures = loadTextureGroup_(pMaterial, aiTextureType_SPECULAR, dir);
+        std::vector<Texture> normalTextures   = loadTextureGroup_(pMaterial, aiTextureType_HEIGHT, dir);
         textures.insert(textures.end(), diffuseTextures.begin(), diffuseTextures.end());
         textures.insert(textures.end(), specularTextures.begin(), specularTextures.end());
         textures.insert(textures.end(), normalTextures.begin(), normalTextures.end());
@@ -112,19 +112,36 @@ namespace UltEngine {
         return { vertices, triangles, lines, points, pMat };
     }
 
-    std::vector<Texture> Scene::loadMaterial_(const aiMaterial* pMaterial, aiTextureType type, const std::string& dir) {
+    std::vector<Texture> Scene::loadTextureGroup_(const aiMaterial* pMaterial, aiTextureType type, const std::string& dir) {
+        // Generate options
+        Options::TextureOptions options;
+        switch (type) {
+            case aiTextureType_DIFFUSE:
+                options = Options::TextureOptions::ColorTextureOptions;
+                break;
+            // TODO: Specular can be in different color space, see: https://www.reddit.com/r/blenderhelp/comments/hda14n/quick_question_which_color_space_for_specular_maps/
+            case aiTextureType_SPECULAR:
+            case aiTextureType_HEIGHT:
+                options = Options::TextureOptions::NonColorTextureOptions;
+                break;
+            default:
+                options = Options::TextureOptions::NonColorTextureOptions;
+                std::cerr << std::format("Unknown image type {}, load as non-color texture", static_cast<int>(type));
+                break;
+        }
+        
         std::vector<Texture> textures;
 
         for (unsigned i = 0; i < pMaterial->GetTextureCount(type); i++) {
             aiString path;
             pMaterial->GetTexture(type, i, &path);
-            textures.emplace_back(loadTexture_(dir + path.C_Str()), type);
+            textures.emplace_back(loadTexture_(dir + path.C_Str(), options), type);
         }
 
         return textures;
     }
 
-    unsigned Scene::loadTexture_(const std::string& path) {
+    unsigned int Scene::loadTexture_(const std::string &path, const Options::TextureOptions &options) {
         const std::string absolute = std::filesystem::absolute(path).generic_string();
 
         if (textureIDs_.find(absolute) == textureIDs_.end()) {
@@ -147,22 +164,21 @@ namespace UltEngine {
                     format = GL_RED;
                     break;
                 case 3:
-                    format = GL_RGB;
+                    format = options.srgb ? GL_SRGB : GL_RGB;
                     break;
                 case 4:
-                    format = GL_RGBA;
+                    format = options.srgb ? GL_SRGB_ALPHA : GL_RGBA;
                     break;
                 default:
                     throw std::runtime_error(std::format("Unexpected texture channels {}", channels));
             }
 
+            // Load based on options
             glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(format), width, height, 0, format, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            if (options.generateMipmap) glGenerateMipmap(GL_TEXTURE_2D);
+            for (const auto [key, val]: options.params) {
+                glTexParameteri(GL_TEXTURE_2D, key, val);
+            }
 
             // Free up memory
             stbi_image_free(data);
