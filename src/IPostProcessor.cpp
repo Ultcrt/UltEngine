@@ -7,5 +7,5 @@
 
 namespace UltEngine {
     IPostProcessor::IPostProcessor(const std::filesystem::path &path):
-    shader_(std::filesystem::path(SHADER_DIRECTORY) / "IPostProcessor.vert",path) {}
+    shader_(std::filesystem::path(SHADER_DIRECTORY) / "PostProcessor.vert", path) {}
 } // UltEngine

@@ -7,6 +7,7 @@
 #include "DirectionalLight.h"
 #include "SpotLight.h"
 #include "CubicEnvironment.h"
+#include "BlurPostProcessor.h"
 
 int main()
 {
@@ -14,6 +15,7 @@ int main()
 
     auto pCamera = std::make_shared<UltEngine::Camera>();
     pCamera->translation = glm::vec3(0.0f, 0.0f, 2.0f);
+    pEngine->onBeforeRenderObservable.add(pCamera);
 
     auto pPointLight = std::make_shared<UltEngine::PointLight>(
             glm::vec3{1.0f, 1.0f, 1.0f},
@@ -43,7 +45,8 @@ int main()
         envDir / "back.jpg"
     });
 
-    pEngine->onBeforeRenderObservable.add(pCamera);
+    const std::shared_ptr<UltEngine::BlurPostProcessor> pBlur = std::make_shared<UltEngine::BlurPostProcessor>(20);
+    pEngine->addPostProcessor(pBlur);
 
     UltEngine::Scene scene;
     scene.pDefaultShader = pEngine->pDefaultShader;

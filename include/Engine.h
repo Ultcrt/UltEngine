@@ -6,6 +6,7 @@
 #define ULTENGINE_ENGINE_H
 
 #include <memory>
+#include <array>
 #include "Options.h"
 #include "Scene.h"
 #include "Observable.h"
@@ -19,15 +20,16 @@ namespace UltEngine {
         int width_;
         int height_;
 
-        unsigned multiFBO_;
-        unsigned multiCTO_;
-        unsigned multiRBO_;
+        GLuint multiFBO_;
+        GLuint multiCTO_;
+        GLuint multiRBO_;
 
-        unsigned screenVAO_;
-        unsigned screenVBO_;
-        unsigned screenFBO_;
-        unsigned screenCTO_;
-        unsigned screenRBO_;
+        GLuint screenVAO_;
+        GLuint screenVBO_;
+
+        std::array<GLuint, 2> pingPongFBO_;
+        std::array<GLuint, 2> pingPongCTO_;
+        std::array<GLuint, 2> pingPongRBO_;
 
         std::shared_ptr<Shader> pScreenShader_;
         std::vector<std::shared_ptr<IPostProcessor>> pPostProcessors_;

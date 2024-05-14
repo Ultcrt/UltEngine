@@ -19,16 +19,16 @@ void main() {
     if (direction) {
         offset.x = 0.0f;
         for (int idx = 1; idx < SIZE; idx++) {
-            sum += weights[idx] * texture(image, input.texCoord + idx * offset);
-            sum += weights[idx] * texture(image, input.texCoord - idx * offset);
+            sum += weights[idx] * texture(image, input.texCoord + idx * offset).rgb;
+            sum += weights[idx] * texture(image, input.texCoord - idx * offset).rgb;
         }
     }
     else {
         offset.y = 0.0f;
         for (int idx = 1; idx < SIZE; idx++) {
-            sum += weights[idx] * texture(image, input.texCoord + idx * offset);
-            sum += weights[idx] * texture(image, input.texCoord - idx * offset);
+            sum += weights[idx] * texture(image, input.texCoord + idx * offset).rgb;
+            sum += weights[idx] * texture(image, input.texCoord - idx * offset).rgb;
         }
     }
-    fragColor = vec4(sum);
+    fragColor = vec4(sum, 1.0f);
 }

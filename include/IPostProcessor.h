@@ -13,7 +13,7 @@ namespace UltEngine {
     public:
         explicit IPostProcessor(const std::filesystem::path& path);
 
-        virtual void process(GLuint fbo, GLuint cto, GLuint rbo) = 0;
+        virtual std::size_t process(GLuint vao, const std::array<GLuint, 2>& fbos, const std::array<GLuint, 2>& ctos, const std::array<GLuint, 2>& rbos, std::size_t inputIdx) = 0;
 
     protected:
         Shader shader_;

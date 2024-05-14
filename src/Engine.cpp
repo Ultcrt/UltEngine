@@ -55,23 +55,32 @@ namespace UltEngine {
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        // Initialize ping pong buffer
+
+
         // Initialize two pass blit frame buffer
-        glGenFramebuffers(1, &screenFBO_);
-            glGenTextures(1, &screenCTO_);
-            glGenRenderbuffers(1, &screenRBO_);
-            glBindFramebuffer(GL_FRAMEBUFFER, screenFBO_);
-            glBindTexture(GL_TEXTURE_2D, screenCTO_);
+        glGenFramebuffers(2, pingPongFBO_.data());
+        glGenTextures(2, pingPongCTO_.data());
+        glGenRenderbuffers(2, pingPongRBO_.data() );
+        for (std::size_t idx = 0; idx < 2; idx++) {
+            glBindFramebuffer(GL_FRAMEBUFFER, pingPongFBO_[idx]);
+
+            glBindTexture(GL_TEXTURE_2D, pingPongCTO_[idx]);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenCTO_, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingPongCTO_[idx], 0);
             glBindTexture(GL_TEXTURE_2D, 0);
 
-            glBindRenderbuffer(GL_RENDERBUFFER, screenRBO_);
+            glBindRenderbuffer(GL_RENDERBUFFER, pingPongRBO_[idx]);
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, screenRBO_);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pingPongRBO_[idx]);
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
 
         // Initialize screen quad
         glGenVertexArrays(1, &screenVAO_);
@@ -156,8 +165,14 @@ namespace UltEngine {
 
             // Blit frame buffer
             glBindFramebuffer(GL_READ_FRAMEBUFFER, multiFBO_);
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, screenFBO_);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingPongFBO_[0]);
             glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+            // Invoke post processor
+            std::size_t outputIdx = 0;
+            for (const auto& pPostProcessor : pPostProcessors_) {
+                outputIdx = pPostProcessor->process(screenVAO_, pingPongFBO_, pingPongCTO_, pingPongRBO_, outputIdx);
+            }
 
             // Second pass
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -165,7 +180,7 @@ namespace UltEngine {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             pScreenShader_->use();
             glBindVertexArray(screenVAO_);
-            glBindTexture(GL_TEXTURE_2D, screenCTO_);
+            glBindTexture(GL_TEXTURE_2D, pingPongFBO_[outputIdx]);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -200,13 +215,15 @@ namespace UltEngine {
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width_, height_);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-        // Update blit frame buffer
-        glBindTexture(GL_TEXTURE_2D, screenCTO_);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glBindRenderbuffer(GL_RENDERBUFFER, screenRBO_);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        // Update ping pong buffer
+        for (std::size_t idx = 0; idx < 2; idx++) {
+            glBindTexture(GL_TEXTURE_2D, pingPongCTO_[idx]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            glBindRenderbuffer(GL_RENDERBUFFER, pingPongRBO_[idx]);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        }
 
         // Update view port (second pass)
         glViewport(0, 0, w, h);
