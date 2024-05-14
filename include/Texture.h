@@ -5,6 +5,7 @@
 #ifndef ULTENGINE_TEXTURE_H
 #define ULTENGINE_TEXTURE_H
 
+#include <filesystem>
 #include "Options.h"
 
 namespace UltEngine {
@@ -13,7 +14,7 @@ namespace UltEngine {
         unsigned id;
         int type;
 
-        Texture(const std::string& path, int type, const Options::TextureOptions& options);
+        Texture(const std::filesystem::path& path, int type, const Options::TextureOptions& options);
 
         Texture(unsigned id, int type);
 

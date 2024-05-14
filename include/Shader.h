@@ -6,18 +6,19 @@
 #define ULTENGINE_SHADER_H
 
 #include <string>
+#include <filesystem>
 #include "glm/glm.hpp"
 #include "glad/glad.h"
 
 namespace UltEngine {
     class Shader {
     private:
-        static unsigned CreateShaderObjectFromFile_(const std::string& path, GLenum type);
+        static unsigned CreateShaderObjectFromFile_(const std::filesystem::path& path, GLenum type);
         unsigned vertexShaderID;
         unsigned fragmentShaderID;
 
     public:
-        Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
+        Shader(const std::filesystem::path& vertexShaderPath, const std::filesystem::path& fragmentShaderPath);
         void use() const;
         unsigned programID;
 

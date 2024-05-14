@@ -17,14 +17,14 @@ namespace UltEngine {
         // TODO: Multiple environment using multiple shader object right now
         Shader shader_;
 
-        unsigned multiCTO_;
-        unsigned screenVAO_;
-        unsigned screenVBO_;
+        unsigned cto_;
+        unsigned vao_;
+        unsigned vbo_;
 
         std::array<Texture, 6> textures_;
 
     public:
-        explicit CubicEnvironment(const std::array<std::string, 6>& paths);
+        explicit CubicEnvironment(const std::array<std::filesystem::path, 6>& paths);
 
         void draw() override;
 

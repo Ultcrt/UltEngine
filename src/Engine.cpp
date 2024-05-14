@@ -98,7 +98,7 @@ namespace UltEngine {
         glBindVertexArray(0);
 
         // Initialize second pass filler shader
-        pScreenShader_ = std::make_shared<Shader>(std::filesystem::path(SHADER_DIRECTORY) / std::string("ScreenFiller.vert"), std::filesystem::path(SHADER_DIRECTORY) / std::string("ScreenFiller.frag"));
+        pScreenShader_ = std::make_shared<Shader>(std::filesystem::path(SHADER_DIRECTORY) / "ScreenFiller.vert", std::filesystem::path(SHADER_DIRECTORY) / "ScreenFiller.frag");
 
         // Set up viewport callback
         glfwSetFramebufferSizeCallback(pWindow, [](GLFWwindow* pWin, int w, int h){
@@ -116,7 +116,7 @@ namespace UltEngine {
         });
 
         // Initialize gl context related member
-        pDefaultShader = std::make_shared<Shader>(std::filesystem::path(SHADER_DIRECTORY) / std::string("BlinnPhong.vert"), std::filesystem::path(SHADER_DIRECTORY) / std::string("BlinnPhong.frag"));
+        pDefaultShader = std::make_shared<Shader>(std::filesystem::path(SHADER_DIRECTORY) / "BlinnPhong.vert", std::filesystem::path(SHADER_DIRECTORY) / "BlinnPhong.frag");
 
         // Set up cursor
         //glfwSetInputMode(pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

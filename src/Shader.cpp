@@ -9,7 +9,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 namespace UltEngine {
-    Shader::Shader(const std::string &vertexShaderPath, const std::string &fragmentShaderPath) {
+    Shader::Shader(const std::filesystem::path &vertexShaderPath, const std::filesystem::path &fragmentShaderPath) {
         // Create shader object
         vertexShaderID = CreateShaderObjectFromFile_(vertexShaderPath, GL_VERTEX_SHADER);
         fragmentShaderID = CreateShaderObjectFromFile_(fragmentShaderPath, GL_FRAGMENT_SHADER);
@@ -28,7 +28,7 @@ namespace UltEngine {
         }
     }
 
-    unsigned Shader::CreateShaderObjectFromFile_(const std::string &path, GLenum type) {
+    unsigned Shader::CreateShaderObjectFromFile_(const std::filesystem::path &path, GLenum type) {
         // Create file streams that throws error when encountering failbit and badbit
         std::ifstream fileStream;
         fileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -59,7 +59,7 @@ namespace UltEngine {
         if (!success) {
             char info[512];
             glGetShaderInfoLog(shaderID, 512, nullptr, info);
-            throw std::runtime_error(std::format("Cannot compile shader at {}:\n{}", path, info));
+            throw std::runtime_error(std::format("Cannot compile shader at {}:\n{}", path.c_str(), info));
         }
 
         return shaderID;

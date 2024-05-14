@@ -8,14 +8,14 @@
 #include "stb_image.h"
 
 namespace UltEngine {
-    Texture::Texture(const std::string &path, int type, const Options::TextureOptions &options): id(0), type(type) {
+    Texture::Texture(const std::filesystem::path &path, int type, const Options::TextureOptions &options): id(0), type(type) {
         stbi_set_flip_vertically_on_load(options.flipVertically);
 
         int width, height, channels;
         unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 
         if (!data) {
-            throw std::runtime_error(std::format("Cannot load texture '{}'", path));
+            throw std::runtime_error(std::format("Cannot load texture '{}'", path.c_str()));
         }
 
         glGenTextures(1, &id);

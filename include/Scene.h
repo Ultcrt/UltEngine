@@ -21,7 +21,7 @@ namespace UltEngine {
     class Scene {
     private:
         std::vector<Mesh> meshes_;
-        std::unordered_map<std::string, unsigned> textureIDs_;
+        std::unordered_map<std::filesystem::path, unsigned> textureIDs_;
 
         std::shared_ptr<Camera> pCamera_;
         std::shared_ptr<IEnvironment> pEnvironment_;

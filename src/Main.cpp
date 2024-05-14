@@ -33,8 +33,8 @@ int main()
             glm::vec3{0.1f, 0.1f, 0.1f});
     pSpotLight->translation = glm::vec3(0.0f, 0.0f, 1.0f);
 
-    const std::filesystem::path envDir = std::filesystem::path(RESOURCES_DIRECTORY) / std::string("skybox");
-    auto pEnvironment = std::make_shared<UltEngine::CubicEnvironment>(std::array<std::string, 6>{
+    const std::filesystem::path envDir = std::filesystem::path(RESOURCES_DIRECTORY) / "skybox";
+    auto pEnvironment = std::make_shared<UltEngine::CubicEnvironment>(std::array<std::filesystem::path, 6>{
         envDir / "right.jpg",
         envDir / "left.jpg",
         envDir / "top.jpg",
@@ -52,7 +52,7 @@ int main()
     scene.addLight(pPointLight);
     scene.addLight(pDirectionalLight);
     scene.addLight(pSpotLight);
-    scene.load(std::filesystem::path(RESOURCES_DIRECTORY) / std::string("backpack/backpack.obj"));
+    scene.load(std::filesystem::path(RESOURCES_DIRECTORY) / "backpack/backpack.obj");
 
     pEngine->render(scene);
 

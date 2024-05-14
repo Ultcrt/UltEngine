@@ -127,7 +127,7 @@ namespace UltEngine {
             pMaterial->GetTexture(type, i, &filename);
 
             // Avoid redundant texture loading
-            const std::string absolute = std::filesystem::absolute(filename.C_Str()).generic_string();
+            const auto absolute = std::filesystem::absolute(filename.C_Str());
             if (textureIDs_.find(absolute) == textureIDs_.end()) {
                 textures.emplace_back(dir / filename.C_Str(), type, options);
                 textureIDs_.insert({absolute, textures.back().id});
