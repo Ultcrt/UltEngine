@@ -216,4 +216,8 @@ namespace UltEngine {
         // Destroy GLFW
         glfwTerminate();
     }
+
+    void Engine::addPostProcessor(const std::shared_ptr<IPostProcessor> &pPostProcessor) {
+        pPostProcessors_.emplace_back(pPostProcessor);
+    }
 } // UltEngine

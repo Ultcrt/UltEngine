@@ -5,10 +5,12 @@
 #ifndef ULTENGINE_ENGINE_H
 #define ULTENGINE_ENGINE_H
 
+#include <memory>
 #include "Options.h"
 #include "Scene.h"
 #include "Observable.h"
-#include <Shader.h>
+#include "Shader.h"
+#include "IPostProcessor.h"
 
 namespace UltEngine {
     class Engine {
@@ -28,6 +30,7 @@ namespace UltEngine {
         unsigned screenRBO_;
 
         std::shared_ptr<Shader> pScreenShader_;
+        std::vector<std::shared_ptr<IPostProcessor>> pPostProcessors_;
 
     public:
         Observable<GLFWwindow*> onBeforeRenderObservable;
@@ -45,6 +48,8 @@ namespace UltEngine {
 
         glm::vec2 getSize();
         void setSize(int w, int h);
+
+        void addPostProcessor(const std::shared_ptr<IPostProcessor>& pPostProcessor);
     };
 } // UltEngine
 
