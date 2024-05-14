@@ -88,7 +88,7 @@ namespace UltEngine {
 
         glBindVertexArray(screenVAO_);
             glBindBuffer(GL_ARRAY_BUFFER, screenVBO_);
-            glBufferData(GL_ARRAY_BUFFER, static_cast<long>(sizeof(vertices)), &vertices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, static_cast<long>(sizeof(vertices)), vertices.data(), GL_STATIC_DRAW);
 
             glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(0));
