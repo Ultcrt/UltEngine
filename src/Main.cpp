@@ -31,6 +31,7 @@ int main()
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{0.1f, 0.1f, 0.1f});
+    pSpotLight->translation = glm::vec3(0.0f, 0.0f, 1.0f);
 
     const std::filesystem::path envDir = std::filesystem::path(RESOURCES_DIRECTORY) / std::string("skybox");
     auto pEnvironment = std::make_shared<UltEngine::CubicEnvironment>(std::array<std::string, 6>{
@@ -48,9 +49,9 @@ int main()
     scene.pDefaultShader = pEngine->pDefaultShader;
     scene.setCamera(pCamera);
     scene.setEnvironment(pEnvironment);
-//    scene.addLight(pPointLight);
+    scene.addLight(pPointLight);
     scene.addLight(pDirectionalLight);
-//    scene.addLight(pSpotLight);
+    scene.addLight(pSpotLight);
     scene.load(std::filesystem::path(RESOURCES_DIRECTORY) / std::string("backpack/backpack.obj"));
 
     pEngine->render(scene);
