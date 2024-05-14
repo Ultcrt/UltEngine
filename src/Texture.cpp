@@ -12,10 +12,10 @@ namespace UltEngine {
         stbi_set_flip_vertically_on_load(options.flipVertically);
 
         int width, height, channels;
-        unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        unsigned char* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
         if (!data) {
-            throw std::runtime_error(std::format("Cannot load texture '{}'", path.c_str()));
+            throw std::runtime_error(std::format("Cannot load texture '{}'", path.string()));
         }
 
         glGenTextures(1, &id);

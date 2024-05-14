@@ -59,7 +59,7 @@ namespace UltEngine {
         if (!success) {
             char info[512];
             glGetShaderInfoLog(shaderID, 512, nullptr, info);
-            throw std::runtime_error(std::format("Cannot compile shader at {}:\n{}", path.c_str(), info));
+            throw std::runtime_error(std::format("Cannot compile shader at {}:\n{}", path.string(), info));
         }
 
         return shaderID;

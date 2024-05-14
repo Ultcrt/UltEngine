@@ -15,10 +15,10 @@ namespace UltEngine {
         std::filesystem::path directory = path.parent_path();
 
         Assimp::Importer importer;
-        const aiScene* pScene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+        const aiScene* pScene = importer.ReadFile(path.string(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
         if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) {
-            throw std::runtime_error(std::format("Cannot load model file {}", path.c_str()));
+            throw std::runtime_error(std::format("Cannot load model file {}", path.string()));
         }
 
         loadNode_(pScene->mRootNode, pScene, directory);
