@@ -1,3 +1,5 @@
+#include <filesystem>
+#include <iostream>
 #include "Engine.h"
 #include "Camera.h"
 #include "Scene.h"
@@ -29,14 +31,14 @@ int main()
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{0.1f, 0.1f, 0.1f});
 
-    const std::string envDir = PROJECT_SOURCE_DIR + std::string("/resources/skybox/");
+    const std::filesystem::path envDir = std::filesystem::path(RESOURCES_DIRECTORY) / std::string("skybox");
     auto pEnvironment = std::make_shared<UltEngine::CubicEnvironment>(std::array<std::string, 6>{
-        envDir + "right.jpg",
-        envDir + "left.jpg",
-        envDir + "top.jpg",
-        envDir + "bottom.jpg",
-        envDir + "front.jpg",
-        envDir + "back.jpg"
+        envDir / "right.jpg",
+        envDir / "left.jpg",
+        envDir / "top.jpg",
+        envDir / "bottom.jpg",
+        envDir / "front.jpg",
+        envDir / "back.jpg"
     });
 
     pEngine->onBeforeRenderObservable.add(pCamera);
@@ -48,8 +50,7 @@ int main()
     scene.addLight(pPointLight);
     scene.addLight(pDirectionalLight);
     scene.addLight(pSpotLight);
-
-    scene.load(PROJECT_SOURCE_DIR + std::string("/resources/backpack/backpack.obj"));
+    scene.load(std::filesystem::path(RESOURCES_DIRECTORY) / std::string("backpack/backpack.obj"));
 
     pEngine->render(scene);
 

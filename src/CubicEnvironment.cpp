@@ -2,14 +2,15 @@
 // Created by ultcrt on 24-5-13.
 //
 
+#include <filesystem>
 #include "CubicEnvironment.h"
 #include "assimp/material.h"
 
 namespace UltEngine {
     CubicEnvironment::CubicEnvironment(const std::array<std::string, 6> &paths):
     multiCTO_(0),
-    shader_(PROJECT_SOURCE_DIR + std::string("/src/shaders/Skybox.vert"),
-            PROJECT_SOURCE_DIR + std::string("/src/shaders/Skybox.frag")) {
+    shader_(std::filesystem::path(SHADER_DIRECTORY) / std::string("Skybox.vert"),
+            std::filesystem::path(SHADER_DIRECTORY) / std::string("Skybox.frag")) {
         // Create texture
         glGenTextures(1, &multiCTO_);
         glBindTexture(GL_TEXTURE_CUBE_MAP, multiCTO_);

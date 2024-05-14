@@ -11,28 +11,20 @@
 #include "glad/glad.h"
 
 namespace UltEngine {
-    void Scene::load(const std::string &path) {
-        std::string dir;
-
-        const std::size_t pos = path.find_last_of('/');
-        if (pos == path.size()) {
-            dir = "./";
-        }
-        else {
-            dir = path.substr(0, pos + 1);
-        }
+    void Scene::load(const std::filesystem::path &path) {
+        std::filesystem::path directory = path.parent_path();
 
         Assimp::Importer importer;
         const aiScene* pScene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
         if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode) {
-            throw std::runtime_error("Cannot load model file");
+            throw std::runtime_error(std::format("Cannot load model file {}", path.c_str()));
         }
 
-        loadNode_(pScene->mRootNode, pScene, dir);
+        loadNode_(pScene->mRootNode, pScene, directory);
     }
 
-    void Scene::loadNode_(const aiNode* pNode, const aiScene* pScene, const std::string& dir) {
+    void Scene::loadNode_(const aiNode* pNode, const aiScene* pScene, const std::filesystem::path& dir) {
         for (unsigned i = 0; i < pNode->mNumMeshes; i++) {
             const aiMesh* pMesh = pScene->mMeshes[pNode->mMeshes[i]];
             meshes_.emplace_back(loadMesh_(pMesh, pScene, dir));
@@ -43,7 +35,7 @@ namespace UltEngine {
         }
     }
 
-    Mesh Scene::loadMesh_(const aiMesh* pMesh, const aiScene* pScene, const std::string& dir) {
+    Mesh Scene::loadMesh_(const aiMesh* pMesh, const aiScene* pScene, const std::filesystem::path& dir) {
         std::vector<Vertex>   vertices;
         std::vector<vec3u>    triangles;
         std::vector<vec2u>    lines;
@@ -110,7 +102,7 @@ namespace UltEngine {
         return { vertices, triangles, lines, points, pMat };
     }
 
-    std::vector<Texture> Scene::loadTextureGroup_(const aiMaterial* pMaterial, aiTextureType type, const std::string& dir) {
+    std::vector<Texture> Scene::loadTextureGroup_(const aiMaterial* pMaterial, aiTextureType type, const std::filesystem::path& dir) {
         // Generate options
         Options::TextureOptions options;
         switch (type) {
@@ -131,13 +123,13 @@ namespace UltEngine {
         std::vector<Texture> textures;
 
         for (unsigned i = 0; i < pMaterial->GetTextureCount(type); i++) {
-            aiString path;
-            pMaterial->GetTexture(type, i, &path);
+            aiString filename;
+            pMaterial->GetTexture(type, i, &filename);
 
             // Avoid redundant texture loading
-            const std::string absolute = std::filesystem::absolute(path.C_Str()).generic_string();
+            const std::string absolute = std::filesystem::absolute(filename.C_Str()).generic_string();
             if (textureIDs_.find(absolute) == textureIDs_.end()) {
-                textures.emplace_back(dir + path.C_Str(), type, options);
+                textures.emplace_back(dir / filename.C_Str(), type, options);
                 textureIDs_.insert({absolute, textures.back().id});
             }
             else {

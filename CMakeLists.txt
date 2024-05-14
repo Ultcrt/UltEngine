@@ -51,7 +51,8 @@ add_executable(engine
         src/PostProcessing.cpp
         include/PostProcessing.h)
 
-target_compile_definitions(engine PRIVATE PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
+target_compile_definitions(engine PRIVATE SHADER_DIRECTORY="${PROJECT_SOURCE_DIR}/src/shaders")
+target_compile_definitions(engine PRIVATE RESOURCES_DIRECTORY="${PROJECT_SOURCE_DIR}/resources")
 
 target_include_directories(engine PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(engine PRIVATE ${PROJECT_SOURCE_DIR}/dependencies/GLAD/include)

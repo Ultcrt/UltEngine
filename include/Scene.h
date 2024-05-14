@@ -9,6 +9,7 @@
 #include <memory>
 #include <unordered_map>
 #include <assimp/scene.h>
+#include <filesystem>
 #include "Mesh.h"
 #include "Data.h"
 #include "Camera.h"
@@ -26,14 +27,14 @@ namespace UltEngine {
         std::shared_ptr<IEnvironment> pEnvironment_;
         std::vector<std::shared_ptr<ILight>> pLights_;
 
-        void loadNode_(const aiNode* pNode, const aiScene* pScene, const std::string& dir);
-        Mesh loadMesh_(const aiMesh* pMesh, const aiScene* pScene, const std::string& dir);
-        std::vector<Texture> loadTextureGroup_(const aiMaterial* pMaterial, aiTextureType type, const std::string& dir);
+        void loadNode_(const aiNode* pNode, const aiScene* pScene, const std::filesystem::path& dir);
+        Mesh loadMesh_(const aiMesh* pMesh, const aiScene* pScene, const std::filesystem::path& dir);
+        std::vector<Texture> loadTextureGroup_(const aiMaterial* pMaterial, aiTextureType type, const std::filesystem::path& dir);
 
     public:
         std::shared_ptr<Shader> pDefaultShader;
 
-        void load(const std::string& path);
+        void load(const std::filesystem::path& path);
 
         void draw() const;
 
