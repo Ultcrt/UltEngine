@@ -25,6 +25,7 @@ int main()
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{0.1f, 0.1f, 0.1f});
+    pDirectionalLight->setDirection(glm::normalize(glm::vec3(1.0f, -1.0f, 1.0f)));
 
     auto pSpotLight = std::make_shared<UltEngine::SpotLight>(
             glm::vec3{1.0f, 1.0f, 1.0f},
@@ -47,9 +48,9 @@ int main()
     scene.pDefaultShader = pEngine->pDefaultShader;
     scene.setCamera(pCamera);
     scene.setEnvironment(pEnvironment);
-    scene.addLight(pPointLight);
+//    scene.addLight(pPointLight);
     scene.addLight(pDirectionalLight);
-    scene.addLight(pSpotLight);
+//    scene.addLight(pSpotLight);
     scene.load(std::filesystem::path(RESOURCES_DIRECTORY) / std::string("backpack/backpack.obj"));
 
     pEngine->render(scene);

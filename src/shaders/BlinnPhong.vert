@@ -17,8 +17,8 @@ uniform mat4 view;
 uniform mat4 projection;
 
 void main() {
-    vec3 worldNormal = vec3(model * vec4(normal, 0.0f));
-    vec3 worldTangent = vec3(model * vec4(tangent, 0.0f));
+    vec3 worldTangent = normalize(vec3(model * vec4(tangent, 0.0f)));
+    vec3 worldNormal = normalize(vec3(model * vec4(normal, 0.0f)));
 
     // Re-orthogonalize using Gram-Schmidt process
     worldTangent = normalize(worldTangent - dot(worldTangent, worldNormal) * worldNormal);
