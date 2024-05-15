@@ -56,9 +56,6 @@ namespace UltEngine {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Initialize ping pong buffer
-
-
-        // Initialize two pass blit frame buffer
         glGenFramebuffers(2, pingPongFBO_.data());
         glGenTextures(2, pingPongCTO_.data());
         glGenRenderbuffers(2, pingPongRBO_.data() );
