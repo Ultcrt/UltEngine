@@ -16,20 +16,29 @@
 namespace UltEngine {
     class Engine {
     private:
+        std::array<GLenum, 2> DefaultDrawAttachments_ = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+
         std::string title_;
         int width_;
         int height_;
 
+        // Lighting pass
         GLuint multiFBO_;
-        GLuint multiCTO_;
+        std::array<GLuint, 2> multiCTOs_;
         GLuint multiRBO_;
 
+        // Screen pass
         GLuint screenVAO_;
         GLuint screenVBO_;
 
-        std::array<GLuint, 2> pingPongFBO_;
-        std::array<GLuint, 2> pingPongCTO_;
-        std::array<GLuint, 2> pingPongRBO_;
+        // Downscaled multi-sampled texture
+        GLuint resolvedFBO_;
+        std::array<GLuint, 2> resolvedCTOs_;
+        GLuint resolvedRBO_;
+
+        std::array<GLuint, 2> pingPongFBOs_;
+        std::array<GLuint, 2> pingPongCTOs_;
+        std::array<GLuint, 2> pingPongRBOs_;
 
         std::shared_ptr<Shader> pScreenShader_;
         std::vector<std::shared_ptr<IPostProcessor>> pPostProcessors_;

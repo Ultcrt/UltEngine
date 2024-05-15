@@ -10,12 +10,15 @@
 
 namespace UltEngine {
     class BlurPostProcessor: public IPostProcessor{
+    private:
+        Shader shader_;
+
     public:
         std::size_t amount;
 
         explicit BlurPostProcessor(std::size_t amount = 5);
 
-        std::size_t process(GLuint vao, const std::array<GLuint, 2>& fbos, const std::array<GLuint, 2>& ctos, const std::array<GLuint, 2>& rbos, std::size_t inputIdx) override;
+        void process(GLuint vao, const std::array<GLuint, 2>& fbos, const std::array<GLuint, 2>& ctos, const std::array<GLuint, 2>& rbos, GLuint resolvedFBO, const std::array<GLuint, 2>& resolvedCTOs) override;
     };
 } // UltEngine
 

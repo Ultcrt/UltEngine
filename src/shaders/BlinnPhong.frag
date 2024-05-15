@@ -11,7 +11,8 @@ in VertexShaderOut {
     mat3 tbn;
 } input;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 brightColor;
 
 struct PointLight {
     vec3 position;
@@ -87,6 +88,11 @@ void main() {
     for (int i = 0; i < spotLightNum; i++) {
         finalColor += CalculateSpotLightShading(spotLights[i], input.position, normal, color, specularIntensity, viewDir);
     }
+
+    float brightness = dot(finalColor, vec3(0.2126, 0.71512, 0.0722));
+    if (brightness > 1.0f) brightColor = vec4(finalColor, 1.0f);
+    else brightColor = vec4(vec3(0.0f), 1.0f);
+    brightColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
     fragColor = vec4(finalColor, 1.0f);
 }

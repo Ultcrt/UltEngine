@@ -1,11 +1,13 @@
 #version 330 core
 
-in vec2 fragTexCoord;
+in VertexShaderOut {
+	vec2 texCoord;
+} input;
 
 out vec4 fragColor;
 
 uniform sampler2D screen;
 
 void main() {
-	fragColor = texture(screen, fragTexCoord);
+	fragColor = texture(screen, input.texCoord);
 }

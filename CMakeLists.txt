@@ -48,10 +48,11 @@ add_executable(engine
         include/CubicEnvironment.h
         src/Texture.cpp
         include/Texture.h
-        src/IPostProcessor.cpp
         include/IPostProcessor.h
         src/BlurPostProcessor.cpp
-        include/BlurPostProcessor.h)
+        include/BlurPostProcessor.h
+        src/BloomPostProcessor.cpp
+        include/BloomPostProcessor.h)
 
 target_compile_definitions(engine PRIVATE SHADER_DIRECTORY="${PROJECT_SOURCE_DIR}/src/shaders")
 target_compile_definitions(engine PRIVATE RESOURCES_DIRECTORY="${PROJECT_SOURCE_DIR}/resources")
