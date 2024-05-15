@@ -316,6 +316,9 @@ namespace UltEngine {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
+        glBindRenderbuffer(GL_RENDERBUFFER, resolvedRBO_);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
         // Update ping pong buffer
         for (std::size_t idx = 0; idx < 2; idx++) {

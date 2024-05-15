@@ -17,7 +17,7 @@ namespace UltEngine {
         float intensity;
         std::size_t amount;
 
-        explicit BloomPostProcessor(std::size_t amount, float bloomIntensity = 1.0f);
+        explicit BloomPostProcessor(std::size_t amount = 5.0f, float bloomIntensity = 1.0f);
 
         void process(GLuint vao, const std::array<GLuint, 2> &fbos, const std::array<GLuint, 2> &ctos, const std::array<GLuint, 2> &rbos, GLuint resolvedFBO, const std::array<GLuint, 2> &resolvedCTOs) override;
     };

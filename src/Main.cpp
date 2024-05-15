@@ -8,6 +8,7 @@
 #include "SpotLight.h"
 #include "CubicEnvironment.h"
 #include "BlurPostProcessor.h"
+#include <BloomPostProcessor.h>
 
 int main()
 {
@@ -45,8 +46,8 @@ int main()
         envDir / "back.jpg"
     });
 
-    const std::shared_ptr<UltEngine::BlurPostProcessor> pBlur = std::make_shared<UltEngine::BlurPostProcessor>(20);
-    pEngine->addPostProcessor(pBlur);
+    const std::shared_ptr<UltEngine::BloomPostProcessor> pBloom = std::make_shared<UltEngine::BloomPostProcessor>();
+    pEngine->addPostProcessor(pBloom);
 
     UltEngine::Scene scene;
     scene.pDefaultShader = pEngine->pDefaultShader;
