@@ -16,16 +16,23 @@
 namespace UltEngine {
     class Engine {
     private:
-        std::array<GLenum, 2> DefaultDrawAttachments_ = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+        std::vector<GLenum> drawAttachments_;
 
         std::string title_;
         int width_;
         int height_;
 
+        bool deferRendering_;
+
+        // Geometry pass
+        GLuint geometryFBO_;
+        std::array<GLuint, 4> geometryGBO_;
+        GLuint geometryRBO_;
+        
         // Lighting pass
-        GLuint multiFBO_;
-        std::array<GLuint, 2> multiCTOs_;
-        GLuint multiRBO_;
+        GLuint lightingFBO_;
+        std::array<GLuint, 2> lightingCTOs_;
+        GLuint lightingRBO_;
 
         // Screen pass
         GLuint screenVAO_;

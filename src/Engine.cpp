@@ -59,7 +59,7 @@ void APIENTRY glDebugOutput(GLenum source,
 }
 
 namespace UltEngine {
-    Engine::Engine(const Options::EngineOptions& options): title_(options.title), width_(options.width), height_(options.height) {
+    Engine::Engine(const Options::EngineOptions& options): title_(options.title), width_(options.width), height_(options.height), deferRendering_(options.deferRendering) {
         // Init GLFW
         if (!glfwInit()) {
             throw std::runtime_error("Cannot initialize GLFW");
@@ -87,33 +87,64 @@ namespace UltEngine {
         // Bind Engine to GLFWwindow object
         glfwSetWindowUserPointer(pWindow, this);
 
-        // Initialize first pass frame buffer
-        glGenFramebuffers(1, &multiFBO_);
-        glGenTextures(2, multiCTOs_.data());
-        glGenRenderbuffers(1, &multiRBO_);
-        glBindFramebuffer(GL_FRAMEBUFFER, multiFBO_);
-        glBindRenderbuffer(GL_RENDERBUFFER, multiRBO_);
+        // Initialize geometry pass
+        if (deferRendering_) {
+            drawAttachments_ = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+            pDefaultShader = std::make_shared<Shader>(std::filesystem::path(SHADER_DIRECTORY) / "DeferBlinnPhong.vert", std::filesystem::path(SHADER_DIRECTORY) / "DeferBlinnPhong.frag");
+
+            glGenFramebuffers(1, &geometryFBO_);
+            glGenTextures(geometryGBO_.size(), geometryGBO_.data());
+            glGenRenderbuffers(1, &geometryRBO_);
+            glBindFramebuffer(GL_FRAMEBUFFER, geometryFBO_);
+            glBindRenderbuffer(GL_RENDERBUFFER, geometryRBO_);
+            // TODO: Fixed sample size
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERER, geometryRBO_);
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+            for (std::size_t idx = 0; idx < geometryGBO_.size(); idx++) {
+                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, geometryGBO_[idx]);
+                glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                // TODO: Fixed sample size
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB16F, width_, height_, GL_TRUE);
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D_MULTISAMPLE, geometryGBO_[idx], 0);
+            }
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+        else {
+            drawAttachments_ = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+            pDefaultShader = std::make_shared<Shader>(std::filesystem::path(SHADER_DIRECTORY) / "BlinnPhong.vert", std::filesystem::path(SHADER_DIRECTORY) / "BlinnPhong.frag");
+        }
+        glDrawBuffers(static_cast<GLint>(drawAttachments_.size()), drawAttachments_.data());
+
+        // Initialize lighting pass frame buffer
+        glGenFramebuffers(1, &lightingFBO_);
+        glGenTextures(lightingCTOs_.size(), lightingCTOs_.data());
+        glGenRenderbuffers(1, &lightingRBO_);
+        glBindFramebuffer(GL_FRAMEBUFFER, lightingFBO_);
+        glBindRenderbuffer(GL_RENDERBUFFER, lightingRBO_);
         // TODO: Fixed sample size
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width_, height_);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, multiRBO_);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, lightingRBO_);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        for (std::size_t idx = 0; idx < 2; idx++) {
-            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, multiCTOs_[idx]);
+        for (std::size_t idx = 0; idx < lightingCTOs_.size(); idx++) {
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, lightingCTOs_[idx]);
             glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             // TODO: Fixed sample size
             glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB16F, width_, height_, GL_TRUE);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D_MULTISAMPLE, multiCTOs_[idx], 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D_MULTISAMPLE, lightingCTOs_[idx], 0);
         }
-        glDrawBuffers(static_cast<GLint>(DefaultDrawAttachments_.size()), DefaultDrawAttachments_.data());
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Initialize downscaled texture
         glGenFramebuffers(1, &resolvedFBO_);
-        glGenTextures(2, resolvedCTOs_.data());
+        glGenTextures(resolvedCTOs_.size(), resolvedCTOs_.data());
         glGenRenderbuffers(1, &resolvedRBO_);
         glBindFramebuffer(GL_FRAMEBUFFER, resolvedFBO_);
         glBindRenderbuffer(GL_RENDERBUFFER, resolvedRBO_);
@@ -121,7 +152,7 @@ namespace UltEngine {
         // TODO: Is RBO necessary?
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, resolvedRBO_);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        for (std::size_t idx = 0; idx < 2; idx++) {
+        for (std::size_t idx = 0; idx < resolvedCTOs_.size(); idx++) {
             glBindTexture(GL_TEXTURE_2D, resolvedCTOs_[idx]);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -134,9 +165,9 @@ namespace UltEngine {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Initialize ping pong buffer
-        glGenFramebuffers(2, pingPongFBOs_.data());
-        glGenTextures(2, pingPongCTOs_.data());
-        glGenRenderbuffers(2, pingPongRBOs_.data());
+        glGenFramebuffers(pingPongFBOs_.size(), pingPongFBOs_.data());
+        glGenTextures(pingPongCTOs_.size(), pingPongCTOs_.data());
+        glGenRenderbuffers(pingPongCTOs_.size(), pingPongRBOs_.data());
         for (std::size_t idx = 0; idx < 2; idx++) {
             glBindFramebuffer(GL_FRAMEBUFFER, pingPongFBOs_[idx]);
 
@@ -199,9 +230,6 @@ namespace UltEngine {
             pEngine->scrollOffset.y = static_cast<float>(offsetY);
         });
 
-        // Initialize gl context related member
-        pDefaultShader = std::make_shared<Shader>(std::filesystem::path(SHADER_DIRECTORY) / "BlinnPhong.vert", std::filesystem::path(SHADER_DIRECTORY) / "BlinnPhong.frag");
-
         // Set up cursor
         //glfwSetInputMode(pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -241,16 +269,25 @@ namespace UltEngine {
             // Notify other input observers
             onBeforeRenderObservable.notifyAll(pWindow);
 
-            // First pass
-            glBindFramebuffer(GL_FRAMEBUFFER, multiFBO_);
-            glEnable(GL_DEPTH_TEST);
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            // Clean up last frame
             glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            if (deferRendering_) {
+                glBindFramebuffer(GL_FRAMEBUFFER, geometryFBO_);
+                glEnable(GL_DEPTH_TEST);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                scene.draw();
+            }
+
+            // Lighting pass
+            glBindFramebuffer(GL_FRAMEBUFFER, lightingFBO_);
+            glEnable(GL_DEPTH_TEST);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             scene.draw();
 
             // Blit frame buffer
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, multiFBO_);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, lightingFBO_);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolvedFBO_);
             glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
@@ -259,7 +296,7 @@ namespace UltEngine {
             glDrawBuffer(GL_COLOR_ATTACHMENT1);
             glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
             glReadBuffer(GL_COLOR_ATTACHMENT0);
-            glDrawBuffers(static_cast<GLint>(DefaultDrawAttachments_.size()), DefaultDrawAttachments_.data());
+            glDrawBuffers(static_cast<GLint>(drawAttachments_.size()), drawAttachments_.data());
 
             // Invoke post processor
             std::size_t outputIdx = 0;
@@ -298,20 +335,20 @@ namespace UltEngine {
         width_ = w;
         height_ = h;
 
-        // Update first pass frame buffer
-        for (std::size_t idx = 0; idx < 2; idx++) {
-            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, multiCTOs_[idx]);
+        // Update lighting pass frame buffer
+        for (std::size_t idx = 0; idx < lightingCTOs_.size(); idx++) {
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, lightingCTOs_[idx]);
             // TODO: Fixed sample size
             glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB16F, width_, height_, GL_TRUE);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
-        glBindRenderbuffer(GL_RENDERBUFFER, multiRBO_);
+        glBindRenderbuffer(GL_RENDERBUFFER, lightingRBO_);
         // TODO: Fixed sample size
         glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width_, height_);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
         // Update downscaled texture
-        for (std::size_t idx = 0; idx < 2; idx++) {
+        for (std::size_t idx = 0; idx < resolvedCTOs_.size(); idx++) {
             glBindTexture(GL_TEXTURE_2D, resolvedCTOs_[idx]);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
             glBindTexture(GL_TEXTURE_2D, 0);

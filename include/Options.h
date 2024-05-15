@@ -16,6 +16,8 @@ namespace UltEngine {
             int width  = 640;
             int height = 360;
             std::string title = "UltEngine";
+
+            bool deferRendering = true;
         };
 
         struct CameraOptions {
