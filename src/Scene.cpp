@@ -141,57 +141,8 @@ namespace UltEngine {
     }
 
     void Scene::draw() const {
-        for (const Mesh& mesh: meshes_) {
-            const auto& pShader = mesh.pMaterial->pShader;
-
-            // Use shader program
-            pShader->use();
-
-            // Set camera params
-            const auto& view = pCamera_->getView();
-            const auto& projection = pCamera_->getProjection();
-            const auto t = glm::inverse(view);
-            pShader->set("view", view);
-            pShader->set("projection", projection);
-            pShader->set("viewPosition", pCamera_->translation);
-
-            // Set up lights
-            std::size_t pointLightNum = 0;
-            std::size_t directionalLightNum = 0;
-            std::size_t spotLightNum = 0;
-            for (const auto& pLight: pLights_) {
-                std::size_t idx = 0;
-                switch (pLight->type()) {
-                    case LightType::PointLight:
-                        idx = pointLightNum++;
-                        break;
-                    case LightType::DirectionalLight:
-                        idx = directionalLightNum++;
-                        break;
-                    case LightType::SpotLight:
-                        idx = spotLightNum++;
-                        break;
-                }
-                pLight->prepare(idx, *pShader);
-            }
-            pShader->set("pointLightNum", static_cast<int>(pointLightNum));
-            pShader->set("directionalLightNum", static_cast<int>(directionalLightNum));
-            pShader->set("spotLightNum", static_cast<int>(spotLightNum));
-
-            // Set up mesh & material
-            mesh.draw();
-        }
-
-        // Draw environment
-        const auto& pEnvironmentShader = pEnvironment_->getShader();
-        pEnvironmentShader->use();
-        // Set camera params
-        const auto& view = pCamera_->getView();
-        const auto& projection = pCamera_->getProjection();
-        pEnvironmentShader->set("view", glm::mat3(view));
-        pEnvironmentShader->set("projection", projection);
-        // Set environment
-        pEnvironment_->draw();
+        drawMesh();
+        drawSkybox();
     }
 
     void Scene::setCamera(const std::shared_ptr<Camera> &pCamera) {
@@ -204,5 +155,68 @@ namespace UltEngine {
 
     void Scene::setEnvironment(const std::shared_ptr<IEnvironment> &pEnvironment) {
         pEnvironment_ = pEnvironment;
+    }
+
+    void Scene::drawMesh() const {
+        for (const Mesh& mesh: meshes_) {
+            const auto& pShader = mesh.pMaterial->pShader;
+
+            // Use shader program
+            pShader->use();
+
+            prepareCamera(*pShader);
+            prepareLights(*pShader);
+
+            // Set up mesh & material
+            mesh.draw();
+        }
+    }
+
+    void Scene::drawSkybox() const {
+        // Draw environment
+        const auto& pEnvironmentShader = pEnvironment_->getShader();
+        pEnvironmentShader->use();
+        // Set camera params
+        const auto& view = pCamera_->getView();
+        const auto& projection = pCamera_->getProjection();
+        pEnvironmentShader->set("view", glm::mat3(view));
+        pEnvironmentShader->set("projection", projection);
+        // Set environment
+        pEnvironment_->draw();
+    }
+
+    void Scene::prepareCamera(const Shader& shader) const {
+        // Set camera params
+        const auto& view = pCamera_->getView();
+        const auto& projection = pCamera_->getProjection();
+        const auto t = glm::inverse(view);
+        shader.set("view", view);
+        shader.set("projection", projection);
+        shader.set("viewPosition", pCamera_->translation);
+    }
+
+    void Scene::prepareLights(const Shader& shader) const {
+        // Set up lights
+        std::size_t pointLightNum = 0;
+        std::size_t directionalLightNum = 0;
+        std::size_t spotLightNum = 0;
+        for (const auto& pLight: pLights_) {
+            std::size_t idx = 0;
+            switch (pLight->type()) {
+                case LightType::PointLight:
+                    idx = pointLightNum++;
+                    break;
+                case LightType::DirectionalLight:
+                    idx = directionalLightNum++;
+                    break;
+                case LightType::SpotLight:
+                    idx = spotLightNum++;
+                    break;
+            }
+            pLight->prepare(idx, shader);
+        }
+        shader.set("pointLightNum", static_cast<int>(pointLightNum));
+        shader.set("directionalLightNum", static_cast<int>(directionalLightNum));
+        shader.set("spotLightNum", static_cast<int>(spotLightNum));
     }
 } // UltEngine

@@ -26,13 +26,14 @@ namespace UltEngine {
 
         // Geometry pass
         GLuint geometryFBO_;
-        std::array<GLuint, 4> geometryGBO_;
+        std::array<GLuint, 4> geometryGBOs_;
+        static std::array<std::string, 4> GeometryBufferNames_;
         GLuint geometryRBO_;
         
-        // Lighting pass
-        GLuint lightingFBO_;
-        std::array<GLuint, 2> lightingCTOs_;
-        GLuint lightingRBO_;
+        // Off-screen
+        GLuint offScreenFBO_;
+        std::array<GLuint, 2> offScreenCTOs_;
+        GLuint offScreenRBO_;
 
         // Screen pass
         GLuint screenVAO_;
@@ -49,6 +50,8 @@ namespace UltEngine {
 
         std::shared_ptr<Shader> pScreenShader_;
         std::vector<std::shared_ptr<IPostProcessor>> pPostProcessors_;
+
+        std::shared_ptr<Shader> pLightingPassShader_;
 
     public:
         Observable<GLFWwindow*> onBeforeRenderObservable;

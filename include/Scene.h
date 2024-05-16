@@ -38,6 +38,14 @@ namespace UltEngine {
 
         void draw() const;
 
+        void drawMesh() const;
+
+        void drawSkybox() const;
+
+        void prepareCamera(const Shader& shader) const;
+
+        void prepareLights(const Shader& shader) const;
+
         void setCamera(const std::shared_ptr<Camera>& pCamera);
 
         void setEnvironment(const std::shared_ptr<IEnvironment>& pEnvironment);

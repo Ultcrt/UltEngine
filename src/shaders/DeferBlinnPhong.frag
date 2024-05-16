@@ -4,7 +4,9 @@
 #define DIRECTIONAL_LIGHT_MAX_NUM 5
 #define SPOT_LIGHT_MAX_NUM 5
 
-in vec2 texCoord;
+in VertexShaderOut {
+    vec2 texCoord;
+} input;
 
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 brightColor;
@@ -68,10 +70,10 @@ vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec
 vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, vec3 viewDir);
 
 void main() {
-    vec3 position = vec3(texture(geometryBuffers.position, texCoord));
-    vec3 color = vec3(texture(geometryBuffers.albedo, texCoord));
-    vec3 normal = vec3(texture(geometryBuffers.normal, texCoord));
-    float specularIntensity = texture(geometryBuffers.specular, texCoord).r;
+    vec3 position = vec3(texture(geometryBuffers.position, input.texCoord));
+    vec3 color = vec3(texture(geometryBuffers.albedo, input.texCoord));
+    vec3 normal = vec3(texture(geometryBuffers.normal, input.texCoord));
+    float specularIntensity = texture(geometryBuffers.specular, input.texCoord).r;
     vec3 viewDir = normalize(viewPosition - position);
 
     vec3 finalColor = vec3(0.0f);
