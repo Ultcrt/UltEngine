@@ -30,5 +30,6 @@ void main() {
     position = vec4(input.position, 1.0f);
     normal   = vec4(input.normal,   1.0f);
     albedo   = texture(material.diffuse0, input.texCoord);
-    specular = texture(material.specular0, input.texCoord);
+    specular.x = texture(material.specular0, input.texCoord).x;
+    specular.y = material.shininess;
 }

@@ -47,7 +47,7 @@ int main()
     });
 
     const std::shared_ptr<UltEngine::BloomPostProcessor> pBloom = std::make_shared<UltEngine::BloomPostProcessor>();
-//    pEngine->addPostProcessor(pBloom);
+    pEngine->addPostProcessor(pBloom);
 
     // TODO: Should require engine to create scene
     UltEngine::Scene scene;

@@ -28,7 +28,6 @@ namespace UltEngine {
         GLuint geometryFBO_;
         std::array<GLuint, 4> geometryGBOs_;
         static std::array<std::string, 4> GeometryBufferNames_;
-        GLuint geometryRBO_;
         
         // Off-screen
         GLuint offScreenFBO_;

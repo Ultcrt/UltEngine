@@ -89,6 +89,28 @@ namespace UltEngine {
         // Bind Engine to GLFWwindow object
         glfwSetWindowUserPointer(pWindow, this);
 
+        // Initialize downscaled texture (off-sreen)
+        glGenFramebuffers(1, &resolvedFBO_);
+        glGenTextures(resolvedCTOs_.size(), resolvedCTOs_.data());
+        glGenRenderbuffers(1, &resolvedRBO_);
+        glBindFramebuffer(GL_FRAMEBUFFER, resolvedFBO_);
+        glBindRenderbuffer(GL_RENDERBUFFER, resolvedRBO_);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
+        // TODO: Is RBO necessary?
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, resolvedRBO_);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        for (std::size_t idx = 0; idx < resolvedCTOs_.size(); idx++) {
+            glBindTexture(GL_TEXTURE_2D, resolvedCTOs_[idx]);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D, resolvedCTOs_[idx], 0);
+        }
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         // Initialize geometry pass
         if (deferRendering_) {
             drawAttachments_ = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
@@ -101,11 +123,10 @@ namespace UltEngine {
 
             glGenFramebuffers(1, &geometryFBO_);
             glGenTextures(geometryGBOs_.size(), geometryGBOs_.data());
-            glGenRenderbuffers(1, &geometryRBO_);
             glBindFramebuffer(GL_FRAMEBUFFER, geometryFBO_);
-            glBindRenderbuffer(GL_RENDERBUFFER, geometryRBO_);
+            glBindRenderbuffer(GL_RENDERBUFFER, resolvedRBO_);          // Reuse rbo from resolved, to reduce memory copy
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, geometryRBO_);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, resolvedRBO_);
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
             for (std::size_t idx = 0; idx < geometryGBOs_.size(); idx++) {
                 glBindTexture(GL_TEXTURE_2D, geometryGBOs_[idx]);
@@ -146,28 +167,6 @@ namespace UltEngine {
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
-
-        // Initialize downscaled texture (off-sreen)
-        glGenFramebuffers(1, &resolvedFBO_);
-        glGenTextures(resolvedCTOs_.size(), resolvedCTOs_.data());
-        glGenRenderbuffers(1, &resolvedRBO_);
-        glBindFramebuffer(GL_FRAMEBUFFER, resolvedFBO_);
-        glBindRenderbuffer(GL_RENDERBUFFER, resolvedRBO_);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
-        // TODO: Is RBO necessary?
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, resolvedRBO_);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        for (std::size_t idx = 0; idx < resolvedCTOs_.size(); idx++) {
-            glBindTexture(GL_TEXTURE_2D, resolvedCTOs_[idx]);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, GL_TEXTURE_2D, resolvedCTOs_[idx], 0);
-        }
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Initialize ping pong buffer
         glGenFramebuffers(pingPongFBOs_.size(), pingPongFBOs_.data());
@@ -274,16 +273,11 @@ namespace UltEngine {
             // Notify other input observers
             onBeforeRenderObservable.notifyAll(pWindow);
 
-            // Clean up last frame
-            glBindFramebuffer(GL_FRAMEBUFFER, offScreenFBO_);
-            glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
             if (deferRendering_) {
                 // Geometry pass
                 glBindFramebuffer(GL_FRAMEBUFFER, geometryFBO_);
                 glDrawBuffers(static_cast<GLint>(drawAttachments_.size()), drawAttachments_.data());
-                glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
+                glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glEnable(GL_DEPTH_TEST);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -306,11 +300,18 @@ namespace UltEngine {
                 glBindVertexArray(screenVAO_);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
                 glBindTexture(GL_TEXTURE_2D, 0);
+
+                // Use forward rendering to draw skybox
+                glEnable(GL_DEPTH_TEST);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                scene.drawSkybox();
             }
             else {
                 // Off-screen rendering
                 glBindFramebuffer(GL_FRAMEBUFFER, offScreenFBO_);
                 glDrawBuffers(static_cast<GLint>(drawAttachments_.size()), drawAttachments_.data());
+                glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glEnable(GL_DEPTH_TEST);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 scene.draw();
@@ -325,6 +326,7 @@ namespace UltEngine {
                 glDrawBuffer(GL_COLOR_ATTACHMENT1);
                 glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
                 glReadBuffer(GL_COLOR_ATTACHMENT0);
+                glDrawBuffer(GL_COLOR_ATTACHMENT0);
             }
 
             // Invoke post processor
@@ -370,14 +372,11 @@ namespace UltEngine {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
                 glBindTexture(GL_TEXTURE_2D, 0);
             }
-            glBindRenderbuffer(GL_RENDERBUFFER, geometryRBO_);
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
-            glBindRenderbuffer(GL_RENDERBUFFER, 0);
         }
         else {
             // Update off-screen frame buffer
-            for (unsigned int lightingCTO : offScreenCTOs_) {
-                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, lightingCTO);
+            for (unsigned int offScreenCTO : offScreenCTOs_) {
+                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, offScreenCTO);
                 // TODO: Fixed sample size
                 glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB16F, width_, height_, GL_TRUE);
                 glBindTexture(GL_TEXTURE_2D, 0);
