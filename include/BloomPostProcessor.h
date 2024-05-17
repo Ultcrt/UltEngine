@@ -19,7 +19,10 @@ namespace UltEngine {
 
         explicit BloomPostProcessor(std::size_t amount = 5.0f, float bloomIntensity = 1.0f);
 
-        void process(GLuint vao, const std::array<GLuint, 2> &fbos, const std::array<GLuint, 2> &ctos, const std::array<GLuint, 2> &rbos, GLuint resolvedFBO, const std::array<GLuint, 2> &resolvedCTOs) override;
+    void process(
+            GLuint vao,
+            const std::array<GLuint, 2>& pingPongFBOs, const std::array<GLuint, 2>& pingPongCTOs, const std::array<GLuint, 2>& pingPongRBOs,
+            GLuint resolvedFBO, const std::array<GLuint, 2>& resolvedCTOs, const std::array<GLuint, 4>& gbos) override;
     };
 } // UltEngine
 

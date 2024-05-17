@@ -331,7 +331,7 @@ namespace UltEngine {
 
             // Invoke post processor
             for (const auto& pPostProcessor : pPostProcessors_) {
-                pPostProcessor->process(screenVAO_, pingPongFBOs_, pingPongCTOs_, pingPongRBOs_, resolvedFBO_, resolvedCTOs_);
+                pPostProcessor->process(screenVAO_, pingPongFBOs_, pingPongCTOs_, pingPongRBOs_, resolvedFBO_, resolvedCTOs_, geometryGBOs_);
             }
 
             // Second pass

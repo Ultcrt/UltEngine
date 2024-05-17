@@ -16,8 +16,9 @@ namespace UltEngine {
          std::filesystem::path(SHADER_DIRECTORY) / "Blend.frag") {}
 
     void
-    BloomPostProcessor::process(GLuint vao, const std::array<GLuint, 2> &fbos, const std::array<GLuint, 2> &ctos,
-                                const std::array<GLuint, 2> &rbos, GLuint resolvedFBO, const std::array<GLuint, 2> &resolvedCTOs) {
+    BloomPostProcessor::process(GLuint vao,
+                                const std::array<GLuint, 2>& pingPongFBOs, const std::array<GLuint, 2>& pingPongCTOs, const std::array<GLuint, 2>& pingPongRBOs,
+                                GLuint resolvedFBO, const std::array<GLuint, 2>& resolvedCTOs, const std::array<GLuint, 4>& gbos) {
         glDisable(GL_DEPTH_TEST);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -27,8 +28,8 @@ namespace UltEngine {
         std::size_t inputIdx = 0;
         std::size_t outputIdx = 1;
         for (std::size_t idx = 0; idx < amount * 2; idx++) {
-            glBindFramebuffer(GL_FRAMEBUFFER, fbos[outputIdx]);
-            glBindTexture(GL_TEXTURE_2D, idx == 0 ? resolvedCTOs[1] : ctos[inputIdx]);
+            glBindFramebuffer(GL_FRAMEBUFFER, pingPongFBOs[outputIdx]);
+            glBindTexture(GL_TEXTURE_2D, idx == 0 ? resolvedCTOs[1] : pingPongCTOs[inputIdx]);
 
             blurShader_.set("direction", inputIdx == 0);
             blurShader_.set("screen", 0);
@@ -41,7 +42,7 @@ namespace UltEngine {
         blendShader_.use();
         glBindFramebuffer(GL_FRAMEBUFFER, resolvedFBO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ctos[inputIdx]);
+        glBindTexture(GL_TEXTURE_2D, pingPongCTOs[inputIdx]);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, resolvedCTOs[0]);
         glActiveTexture(GL_TEXTURE0);

@@ -11,7 +11,10 @@
 namespace UltEngine {
     class IPostProcessor {
     public:
-        virtual void process(GLuint vao, const std::array<GLuint, 2>& fbos, const std::array<GLuint, 2>& ctos, const std::array<GLuint, 2>& rbos, GLuint resolvedFBO, const std::array<GLuint, 2>& resolvedCTOs) = 0;
+        virtual void process(
+                GLuint vao,
+                const std::array<GLuint, 2>& pingPongFBOs, const std::array<GLuint, 2>& pingPongCTOs, const std::array<GLuint, 2>& pingPongRBOs,
+                GLuint resolvedFBO, const std::array<GLuint, 2>& resolvedCTOs, const std::array<GLuint, 4>& gbos) = 0;
     };
 } // UltEngine
 
