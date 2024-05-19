@@ -331,7 +331,7 @@ namespace UltEngine {
 
             // Invoke post processor
             for (const auto& pPostProcessor : pPostProcessors_) {
-                pPostProcessor->process(screenVAO_, pingPongFBOs_, pingPongCTOs_, pingPongRBOs_, resolvedFBO_, resolvedCTOs_, geometryGBOs_);
+                pPostProcessor->process(screenVAO_, pingPongFBOs_, pingPongCTOs_, pingPongRBOs_, resolvedFBO_, resolvedCTOs_, geometryGBOs_, glm::vec2(width_, height_), scene);
             }
 
             // Second pass

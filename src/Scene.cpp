@@ -153,6 +153,10 @@ namespace UltEngine {
         pLights_.emplace_back(pLight);
     }
 
+    std::shared_ptr<Camera> Scene::getCamera() const {
+        return pCamera_;
+    }
+
     void Scene::setEnvironment(const std::shared_ptr<IEnvironment> &pEnvironment) {
         pEnvironment_ = pEnvironment;
     }

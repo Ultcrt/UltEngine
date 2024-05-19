@@ -51,6 +51,8 @@ namespace UltEngine {
         void setEnvironment(const std::shared_ptr<IEnvironment>& pEnvironment);
 
         void addLight(const std::shared_ptr<ILight>& pLight);
+
+        std::shared_ptr<Camera> getCamera() const;
     };
 } // UltEngine
 

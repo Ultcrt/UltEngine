@@ -8,7 +8,8 @@
 #include "SpotLight.h"
 #include "CubicEnvironment.h"
 #include "BlurPostProcessor.h"
-#include <BloomPostProcessor.h>
+#include "BloomPostProcessor.h"
+#include "SSAOPostProcessor.h"
 
 int main()
 {
@@ -45,6 +46,9 @@ int main()
         envDir / "front.jpg",
         envDir / "back.jpg"
     });
+
+    const std::shared_ptr<UltEngine::SSAOPostProcessor> pSSAO = std::make_shared<UltEngine::SSAOPostProcessor>();
+    pEngine->addPostProcessor(pSSAO);
 
     const std::shared_ptr<UltEngine::BloomPostProcessor> pBloom = std::make_shared<UltEngine::BloomPostProcessor>();
     pEngine->addPostProcessor(pBloom);
