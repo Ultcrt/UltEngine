@@ -14,7 +14,6 @@ namespace UltEngine {
         float radius_;
         std::size_t sampleNum_ = 64;
         std::size_t noiseSize_;
-        std::size_t amount_;
 
         Shader ssaoShader_;
         Shader multiplyShader_;
@@ -24,7 +23,7 @@ namespace UltEngine {
 
     public:
         // TODO: sampleNum not working right now
-        SSAOPostProcessor(float radius = 0.5, std::size_t noiseSize = 4, std::size_t amount = 5);
+        SSAOPostProcessor(float radius = 0.5, std::size_t noiseSize = 4);
 
         void process(GLuint vao, const std::array<GLuint, 2> &pingPongFBOs, const std::array<GLuint, 2> &pingPongCTOs,
                      const std::array<GLuint, 2> &pingPongRBOs, GLuint resolvedFBO,

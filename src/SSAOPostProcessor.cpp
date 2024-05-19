@@ -6,12 +6,12 @@
 #include "SSAOPostProcessor.h"
 
 namespace UltEngine {
-    SSAOPostProcessor::SSAOPostProcessor(float radius, std::size_t noiseSize, std::size_t amount):
+    SSAOPostProcessor::SSAOPostProcessor(float radius, std::size_t noiseSize):
     ssaoShader_(SHADER_DIRECTORY / std::filesystem::path("ScreenFiller.vert"),
             SHADER_DIRECTORY / std::filesystem::path("SSAO.frag")), 
     multiplyShader_(std::filesystem::path(SHADER_DIRECTORY) / "ScreenFiller.vert",
         std::filesystem::path(SHADER_DIRECTORY) / "SSAOMultiply.frag"),
-    radius_(radius), noiseSize_(noiseSize), amount_(amount) {
+    radius_(radius), noiseSize_(noiseSize) {
         std::random_device rd;
         std::mt19937 mt(rd());
         std::uniform_real_distribution<float> dist(0.0f, 1.0f);
@@ -20,7 +20,7 @@ namespace UltEngine {
             glm::vec3 point = {
                 2.0f * dist(mt) - 1.0f,
                 2.0f * dist(mt) - 1.0f,
-                2.0f * dist(mt) - 1.0f
+                dist(mt)
             };
 
             point = glm::normalize(point);
