@@ -3,6 +3,7 @@
 //
 
 #include <random>
+#include <format>
 #include "SSAOPostProcessor.h"
 
 namespace UltEngine {
