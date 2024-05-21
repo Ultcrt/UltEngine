@@ -4,7 +4,7 @@
 
 #include <format>
 #include <iostream>
-#include "SpotLight.h"
+#include "light/SpotLight.h"
 
 namespace UltEngine {
     SpotLight::SpotLight(const glm::vec3 &diffuse, const glm::vec3 &specular, const glm::vec3 &ambient) : DirectionalLight(diffuse, specular, ambient) {}

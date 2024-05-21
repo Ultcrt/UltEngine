@@ -2,7 +2,7 @@
 // Created by ultcrt on 24-5-14.
 //
 
-#include "BlurPostProcessor.h"
+#include "postprocessor/BlurPostProcessor.h"
 
 namespace UltEngine {
     BlurPostProcessor::BlurPostProcessor(std::size_t amount):

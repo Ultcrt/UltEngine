@@ -3,7 +3,7 @@
 //
 
 #include <format>
-#include "PointLight.h"
+#include "light/PointLight.h"
 
 namespace UltEngine {
     void PointLight::prepare(std::size_t idx, const Shader &shader) {

@@ -33,28 +33,28 @@ add_executable(engine
         include/Observer.h
         include/Material.h
         src/Material.cpp
-        src/ILight.cpp
-        include/ILight.h
-        src/PointLight.cpp
-        include/PointLight.h
-        src/DirectionalLight.cpp
-        include/DirectionalLight.h
-        src/SpotLight.cpp
-        include/SpotLight.h
+        src/light/ILight.cpp
+        include/light/ILight.h
+        src/light/PointLight.cpp
+        include/light/PointLight.h
+        src/light/DirectionalLight.cpp
+        include/light/DirectionalLight.h
+        src/light/SpotLight.cpp
+        include/light/SpotLight.h
         src/Options.cpp
-        src/IEnvironment.cpp
-        include/IEnvironment.h
-        src/CubicEnvironment.cpp
-        include/CubicEnvironment.h
+        src/environment/IEnvironment.cpp
+        include/environment/IEnvironment.h
+        src/environment/CubicEnvironment.cpp
+        include/environment/CubicEnvironment.h
         src/Texture.cpp
         include/Texture.h
-        include/IPostProcessor.h
-        src/BlurPostProcessor.cpp
-        include/BlurPostProcessor.h
-        src/BloomPostProcessor.cpp
-        include/BloomPostProcessor.h
-        src/SSAOPostProcessor.cpp
-        include/SSAOPostProcessor.h  )
+        include/postprocessor/IPostProcessor.h
+        src/postprocessor/BlurPostProcessor.cpp
+        include/postprocessor/BlurPostProcessor.h
+        src/postprocessor/BloomPostProcessor.cpp
+        include/postprocessor/BloomPostProcessor.h
+        src/postprocessor/SSAOPostProcessor.cpp
+        include/postprocessor/SSAOPostProcessor.h)
 
 target_compile_definitions(engine PRIVATE SHADER_DIRECTORY="${PROJECT_SOURCE_DIR}/src/shaders")
 target_compile_definitions(engine PRIVATE RESOURCES_DIRECTORY="${PROJECT_SOURCE_DIR}/resources")

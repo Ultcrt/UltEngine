@@ -11,7 +11,7 @@
 #include "Scene.h"
 #include "Observable.h"
 #include "Shader.h"
-#include "IPostProcessor.h"
+#include "postprocessor/IPostProcessor.h"
 
 namespace UltEngine {
     class Engine {

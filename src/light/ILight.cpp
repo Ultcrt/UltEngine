@@ -3,7 +3,7 @@
 //
 
 #include <stdexcept>
-#include "ILight.h"
+#include "light/ILight.h"
 
 namespace UltEngine {
     ILight::ILight(const glm::vec3 &diffuse, const glm::vec3 &specular, const glm::vec3 &ambient): diffuse(diffuse), specular(specular), ambient(ambient)  {}

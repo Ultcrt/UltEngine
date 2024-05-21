@@ -3,7 +3,7 @@
 //
 
 #include <array>
-#include "BloomPostProcessor.h"
+#include "postprocessor/BloomPostProcessor.h"
 #include <iostream>
 
 namespace UltEngine {

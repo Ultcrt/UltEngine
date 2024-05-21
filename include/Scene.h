@@ -13,9 +13,9 @@
 #include "Mesh.h"
 #include "Data.h"
 #include "Camera.h"
-#include "ILight.h"
+#include "light/ILight.h"
 #include "Texture.h"
-#include "IEnvironment.h"
+#include "environment/IEnvironment.h"
 
 namespace UltEngine {
     class Scene {

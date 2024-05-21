@@ -3,13 +3,13 @@
 #include "Engine.h"
 #include "Camera.h"
 #include "Scene.h"
-#include "PointLight.h"
-#include "DirectionalLight.h"
-#include "SpotLight.h"
-#include "CubicEnvironment.h"
-#include "BlurPostProcessor.h"
-#include "BloomPostProcessor.h"
-#include "SSAOPostProcessor.h"
+#include "light/PointLight.h"
+#include "light/DirectionalLight.h"
+#include "light/SpotLight.h"
+#include "environment/CubicEnvironment.h"
+#include "postprocessor/BlurPostProcessor.h"
+#include "postprocessor/BloomPostProcessor.h"
+#include "postprocessor/SSAOPostProcessor.h"
 
 int main()
 {

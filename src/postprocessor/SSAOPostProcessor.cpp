@@ -4,7 +4,7 @@
 
 #include <random>
 #include <format>
-#include "SSAOPostProcessor.h"
+#include "postprocessor/SSAOPostProcessor.h"
 
 namespace UltEngine {
     SSAOPostProcessor::SSAOPostProcessor(float radius, std::size_t noiseSize):

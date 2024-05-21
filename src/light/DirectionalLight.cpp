@@ -4,7 +4,7 @@
 
 #include <format>
 #include <glm/gtc/quaternion.hpp>
-#include "DirectionalLight.h"
+#include "light/DirectionalLight.h"
 
 namespace UltEngine {
     DirectionalLight::DirectionalLight(const glm::vec3 &diffuse, const glm::vec3 &specular, const glm::vec3 &ambient): ILight(diffuse, specular, ambient) {}

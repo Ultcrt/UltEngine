@@ -8,7 +8,7 @@
 #include <array>
 #include <string>
 #include <memory>
-#include "IEnvironment.h"
+#include "environment/IEnvironment.h"
 #include "Texture.h"
 
 namespace UltEngine {

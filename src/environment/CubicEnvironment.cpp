@@ -3,7 +3,7 @@
 //
 
 #include <filesystem>
-#include "CubicEnvironment.h"
+#include "environment/CubicEnvironment.h"
 #include "assimp/material.h"
 
 namespace UltEngine {
