@@ -16,6 +16,8 @@
 namespace UltEngine {
     class Engine {
     private:
+        GLuint shadowFBO_ = 0;
+
         std::vector<GLenum> drawAttachments_;
 
         std::string title_;

@@ -26,6 +26,8 @@ namespace UltEngine {
 
         void draw() const;
 
+        void draw(const Shader& shader) const;
+
     private:
         unsigned vao_ = 0;
         unsigned vbo_ = 0;

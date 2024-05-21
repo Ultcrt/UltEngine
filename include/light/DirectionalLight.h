@@ -15,7 +15,9 @@ namespace UltEngine {
     public:
         explicit DirectionalLight(const glm::vec3& diffuse, const glm::vec3& specular, const glm::vec3& ambient);
 
-        void prepare(std::size_t idx, const Shader &shader) override;
+        void prepare(std::size_t idx, const Shader &shader, std::size_t& unitId) override;
+
+        void prepareShadowMap(const Shader &shader, const BoundingInfo& frustumBoundingInfo) override;
 
         LightType type() override;
 

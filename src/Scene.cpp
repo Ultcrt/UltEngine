@@ -141,6 +141,7 @@ namespace UltEngine {
     }
 
     void Scene::draw() const {
+        drawShadow();
         drawMesh();
         drawSkybox();
     }
@@ -162,6 +163,7 @@ namespace UltEngine {
     }
 
     void Scene::drawMesh() const {
+        // Rendering pass
         for (const Mesh& mesh: meshes_) {
             const auto& pShader = mesh.pMaterial->pShader;
 
@@ -201,6 +203,7 @@ namespace UltEngine {
 
     void Scene::prepareLights(const Shader& shader) const {
         // Set up lights
+        std::size_t unitId = 7;
         std::size_t pointLightNum = 0;
         std::size_t directionalLightNum = 0;
         std::size_t spotLightNum = 0;
@@ -217,10 +220,28 @@ namespace UltEngine {
                     idx = spotLightNum++;
                     break;
             }
-            pLight->prepare(idx, shader);
+            pLight->prepare(idx, shader, unitId);
         }
         shader.set("pointLightNum", static_cast<int>(pointLightNum));
         shader.set("directionalLightNum", static_cast<int>(directionalLightNum));
         shader.set("spotLightNum", static_cast<int>(spotLightNum));
+    }
+
+    void Scene::drawShadow() const {
+        // Shadowing pass
+        shadowMapShader.use();
+
+        const auto boundingInfo = pCamera_->getBoundingInfo();
+        for (const auto& pLight: pLights_) {
+            if (pLight->castShadows) {
+                pLight->prepareShadowMap(shadowMapShader, boundingInfo);
+                // Clean up
+                glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                for (const Mesh& mesh: meshes_) {
+                    mesh.draw(shadowMapShader);
+                }
+            }
+        }
     }
 } // UltEngine

@@ -1,5 +1,7 @@
 #version 330 core
 
+#define BIAS 0.0001
+
 #define POINT_LIGHT_MAX_NUM 5
 #define DIRECTIONAL_LIGHT_MAX_NUM 5
 #define SPOT_LIGHT_MAX_NUM 5
@@ -21,6 +23,10 @@ struct PointLight {
     float constant;
     float linear;
     float quadratic;
+
+    sampler2D shadowMap;
+    mat4 view;
+    mat4 projection;
 };
 
 struct DirectionalLight {
@@ -29,6 +35,10 @@ struct DirectionalLight {
     vec3 diffuse;
     vec3 specular;
     vec3 ambient;
+
+    sampler2D shadowMap;
+    mat4 view;
+    mat4 projection;
 };
 
 struct SpotLight {
@@ -41,6 +51,10 @@ struct SpotLight {
 
     float innerCutoff;
     float outerCutoff;
+
+    sampler2D shadowMap;
+    mat4 view;
+    mat4 projection;
 };
 
 struct GeometryBuffers {
@@ -100,7 +114,16 @@ vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, ve
     vec3 diffuse  = light.diffuse * color * max(dot(lightDir, normal), 0.0f);
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), shininess);
 
-    return (ambient + diffuse + specular) * attenuation;
+    // Shadow
+    vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
+    shadowSpacePosition.xyz /= shadowSpacePosition.w;
+    shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
+    if (shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+        return ambient + (diffuse + specular) * attenuation;
+    }
+    else {
+        return ambient;
+    }
 }
 
 vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir) {
@@ -111,7 +134,16 @@ vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec
     vec3 diffuse  = light.diffuse * color * max(dot(lightDir, normal), 0.0f);
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f),shininess);
 
-    return ambient + diffuse + specular;
+    // Shadow
+    vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
+    shadowSpacePosition.xyz /= shadowSpacePosition.w;
+    shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
+    if (shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+        return ambient + diffuse + specular;
+    }
+    else {
+        return ambient;
+    }
 }
 
 vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir) {
@@ -126,5 +158,14 @@ vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3
     vec3 diffuse  = light.diffuse * color * max(dot(lightDir, normal), 0.0f);
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), shininess);
 
-    return ambient + (diffuse + specular) * attenuation;
+    // Shadow
+    vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
+    shadowSpacePosition.xyz /= shadowSpacePosition.w;
+    shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
+    if (shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+        return ambient + (diffuse + specular) * attenuation;
+    }
+    else {
+        return ambient;
+    }
 }

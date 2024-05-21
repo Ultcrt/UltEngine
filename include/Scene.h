@@ -20,6 +20,10 @@
 namespace UltEngine {
     class Scene {
     private:
+        Shader shadowMapShader = {
+        std::filesystem::path(SHADER_DIRECTORY) / "Simplest.vert",
+        std::filesystem::path(SHADER_DIRECTORY) / "Simplest.frag"};
+
         std::vector<Mesh> meshes_;
         std::unordered_map<std::filesystem::path, unsigned> textureIDs_;
 
@@ -37,6 +41,8 @@ namespace UltEngine {
         void load(const std::filesystem::path& path);
 
         void draw() const;
+
+        void drawShadow() const;
 
         void drawMesh() const;
 

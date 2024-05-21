@@ -30,6 +30,7 @@ int main()
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{0.1f, 0.1f, 0.1f});
     pDirectionalLight->setDirection(glm::normalize(glm::vec3(1.0f, -1.0f, 1.0f)));
+    pDirectionalLight->castShadows = true;
 
     auto pSpotLight = std::make_shared<UltEngine::SpotLight>(
             glm::vec3{10.0f, 10.0f, 10.0f},

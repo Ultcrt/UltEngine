@@ -15,7 +15,7 @@ namespace UltEngine {
 
         SpotLight(const glm::vec3& diffuse, const glm::vec3& specular, const glm::vec3& ambient);
 
-        void prepare(std::size_t idx, const UltEngine::Shader &shader) override;
+        void prepare(std::size_t idx, const UltEngine::Shader &shader, std::size_t& unitId) override;
 
         LightType type() override;
     };

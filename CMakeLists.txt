@@ -54,7 +54,9 @@ add_executable(engine
         src/postprocessor/BloomPostProcessor.cpp
         include/postprocessor/BloomPostProcessor.h
         src/postprocessor/SSAOPostProcessor.cpp
-        include/postprocessor/SSAOPostProcessor.h)
+        include/postprocessor/SSAOPostProcessor.h
+        src/BoundingInfo.cpp
+        include/BoundingInfo.h)
 
 target_compile_definitions(engine PRIVATE SHADER_DIRECTORY="${PROJECT_SOURCE_DIR}/src/shaders")
 target_compile_definitions(engine PRIVATE RESOURCES_DIRECTORY="${PROJECT_SOURCE_DIR}/resources")

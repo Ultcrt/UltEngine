@@ -89,6 +89,13 @@ namespace UltEngine {
         // Bind Engine to GLFWwindow object
         glfwSetWindowUserPointer(pWindow, this);
 
+        // Initialize shadow pass
+        glGenFramebuffers(1, &shadowFBO_);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         // Initialize downscaled texture (off-sreen)
         glGenFramebuffers(1, &resolvedFBO_);
         glGenTextures(resolvedCTOs_.size(), resolvedCTOs_.data());
@@ -282,6 +289,13 @@ namespace UltEngine {
                 glEnable(GL_DEPTH_TEST);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 scene.drawMesh();
+
+                // Shadow pass
+                glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
+                glEnable(GL_DEPTH_TEST);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                scene.drawShadow();
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
                 // Lighting pass (off-screen, directly to resolved ones, since defer render does not have multisample)
                 glBindFramebuffer(GL_FRAMEBUFFER, resolvedFBO_);

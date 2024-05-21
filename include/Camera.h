@@ -9,6 +9,7 @@
 #include "Options.h"
 #include "TransformationNode.h"
 #include "Observer.h"
+#include "BoundingInfo.h"
 
 namespace UltEngine {
     class Camera: public TransformationNode, public RenderObserver {
@@ -41,6 +42,8 @@ namespace UltEngine {
 
         [[nodiscard]] glm::mat4 getProjection() const;
         [[nodiscard]] glm::mat4 getView() const;
+
+        [[nodiscard]] BoundingInfo getBoundingInfo() const;
     };
 } // UltEngine
 

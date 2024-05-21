@@ -46,9 +46,13 @@ namespace UltEngine {
     }
 
     void Mesh::draw() const {
-        pMaterial->pShader->set("model", transformation_);
-
         pMaterial->prepare();
+
+        draw(*pMaterial->pShader);
+    }
+
+    void Mesh::draw(const Shader &shader) const {
+        shader.set("model", transformation_);
 
         glBindVertexArray(vao_);
         glDrawElements(GL_TRIANGLES, static_cast<int>(triangles.size()) * 3, GL_UNSIGNED_INT, nullptr);

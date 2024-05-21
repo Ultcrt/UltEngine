@@ -92,4 +92,17 @@ namespace UltEngine {
         updateView();
         updateProjection();
     }
+
+    BoundingInfo Camera::getBoundingInfo() const {
+        float tanFOV = glm::tan(fov / 2.0f);
+        glm::vec3 nearLeftTop = glm::vec3(-aspect * tanFOV * near, tanFOV * near, -near);
+        glm::vec3 farRightBottom = glm::vec3(aspect * tanFOV * far, -tanFOV * far, -far);
+
+        glm::mat4 invView = glm::inverse(view_);
+
+        nearLeftTop    = invView * glm::vec4(nearLeftTop, 1.0f);
+        farRightBottom = invView * glm::vec4(farRightBottom, 1.0f);
+
+        return {(nearLeftTop + farRightBottom) / 2.0f, glm::length(nearLeftTop - farRightBottom)};
+    }
 } // UltEngine

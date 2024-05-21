@@ -6,7 +6,8 @@
 #include "light/ILight.h"
 
 namespace UltEngine {
-    ILight::ILight(const glm::vec3 &diffuse, const glm::vec3 &specular, const glm::vec3 &ambient): diffuse(diffuse), specular(specular), ambient(ambient)  {}
+    ILight::ILight(const glm::vec3 &diffuse, const glm::vec3 &specular, const glm::vec3 &ambient, std::size_t shadowMapWidth, std::size_t shadowMapHeight):
+    diffuse(diffuse), specular(specular), ambient(ambient), shadowMapWidth_(shadowMapWidth), shadowMapHeight_(shadowMapHeight)  {}
 
     std::string ILight::signature() {
         LightType lightType = type();
