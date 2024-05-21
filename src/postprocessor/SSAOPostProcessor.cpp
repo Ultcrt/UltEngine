@@ -102,6 +102,7 @@ namespace UltEngine {
 
         multiplyShader_.use();
         glBindFramebuffer(GL_FRAMEBUFFER, resolvedFBO);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, pingPongCTOs[0]);
         multiplyShader_.set("weight", 0);

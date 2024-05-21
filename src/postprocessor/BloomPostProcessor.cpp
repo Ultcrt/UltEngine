@@ -29,6 +29,7 @@ namespace UltEngine {
         std::size_t outputIdx = 1;
         for (std::size_t idx = 0; idx < amount * 2; idx++) {
             glBindFramebuffer(GL_FRAMEBUFFER, pingPongFBOs[outputIdx]);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0);
             glBindTexture(GL_TEXTURE_2D, idx == 0 ? resolvedCTOs[1] : pingPongCTOs[inputIdx]);
 
             blurShader_.set("direction", inputIdx == 0);
