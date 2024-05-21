@@ -115,7 +115,7 @@ vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec
 }
 
 vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir) {
-    vec3  lightDir    = -light.direction;
+    vec3  lightDir    = normalize(light.position - position);
     vec3  halfVec     = normalize(lightDir + viewDir);
     float distance    = length(light.position - position);
     float theta       = dot(normalize(position - light.position), light.direction);
