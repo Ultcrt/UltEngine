@@ -1,6 +1,6 @@
 #version 330 core
 
-#define BIAS 0.0001
+#define BIAS 0.001
 
 #define POINT_LIGHT_MAX_NUM 5
 #define DIRECTIONAL_LIGHT_MAX_NUM 5

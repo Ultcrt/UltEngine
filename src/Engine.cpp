@@ -296,6 +296,7 @@ namespace UltEngine {
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 scene.drawShadow();
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glViewport(0, 0, width_, height_);
 
                 // Lighting pass (off-screen, directly to resolved ones, since defer render does not have multisample)
                 glBindFramebuffer(GL_FRAMEBUFFER, resolvedFBO_);

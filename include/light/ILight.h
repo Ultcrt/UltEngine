@@ -29,7 +29,7 @@ namespace UltEngine {
         bool castShadows = false;
 
         explicit ILight(const glm::vec3& diffuse, const glm::vec3& specular, const glm::vec3& ambient,
-                        std::size_t shadowMapWidth = 640, std::size_t shadowMapHeight = 640);
+                        std::size_t shadowMapWidth = 1024, std::size_t shadowMapHeight = 1024);
 
         std::string signature();
 

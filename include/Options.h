@@ -25,7 +25,7 @@ namespace UltEngine {
             float fov    = glm::radians(45.0f);
             float aspect = 640.0f / 360.0f;
             float near   = 0.1f;
-            float far    = 5.0f;
+            float far    = 100.0f;
 
             // Movement options
             float moveSpeed = 2.5f;

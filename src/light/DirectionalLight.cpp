@@ -42,7 +42,7 @@ namespace UltEngine {
         if (castShadows) {
             glActiveTexture(GL_TEXTURE0 + unitId);
             glBindTexture(GL_TEXTURE_2D, shadowMap_);
-            shader.set(std::format("{}[{}].shadowMap_", lightSignature, idx), static_cast<int>(unitId++));
+            shader.set(std::format("{}[{}].shadowMap", lightSignature, idx), static_cast<int>(unitId++));
             shader.set(std::format("{}[{}].view", lightSignature, idx), view_);
             shader.set(std::format("{}[{}].projection", lightSignature, idx), projection_);
         }
@@ -53,11 +53,14 @@ namespace UltEngine {
     }
 
     void DirectionalLight::prepareShadowMap(const Shader &shader, const BoundingInfo& frustumBoundingInfo) {
+        glViewport(0, 0, static_cast<GLint>(shadowMapWidth_), static_cast<GLint>(shadowMapHeight_));
+
         glm::vec3 xAxis = {1.0f, 0.0f, 0.0f};
         glm::vec3 yAxis = {0.0f, 1.0f, 0.0f};
 
-        float radius = frustumBoundingInfo.getRadius();
-        auto  center = frustumBoundingInfo.getCenter();
+        float radius = glm::min(frustumBoundingInfo.getRadius(), 5.0f);
+        // TODO: Light position is fixed
+        auto  center = glm::vec3(0.0f, 0.0f, 0.0f);
 
         view_ = glm::lookAt(
                 center,
