@@ -1,6 +1,7 @@
 #version 330 core
 
-#define BIAS 0.001
+#define MIN_BIAS 0.005
+#define MAX_BIAS 0.05
 
 #define POINT_LIGHT_MAX_NUM 5
 #define DIRECTIONAL_LIGHT_MAX_NUM 5
@@ -115,12 +116,14 @@ vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, ve
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), shininess);
 
     // Shadow
+    float bias = max(MAX_BIAS * (1 - dot(normal, lightDir)), MIN_BIAS);
+
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
 
     // Outside light frustum far plane is also considered as not in shadow
-    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + bias) {
         return ambient + (diffuse + specular) * attenuation;
     }
     else {
@@ -137,10 +140,12 @@ vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f),shininess);
 
     // Shadow
+    float bias = max(MAX_BIAS * (1 - dot(normal, lightDir)), MIN_BIAS);
+
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
-    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + bias) {
         return ambient + diffuse + specular;
     }
     else {
@@ -161,10 +166,12 @@ vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), shininess);
 
     // Shadow
+    float bias = max(MAX_BIAS * (1 - dot(normal, lightDir)), MIN_BIAS);
+
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
-    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + bias) {
         return ambient + (diffuse + specular) * attenuation;
     }
     else {
