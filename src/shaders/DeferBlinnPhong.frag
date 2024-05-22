@@ -118,7 +118,9 @@ vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, ve
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
-    if (shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+
+    // Outside light frustum far plane is also considered as not in shadow
+    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
         return ambient + (diffuse + specular) * attenuation;
     }
     else {
@@ -138,7 +140,7 @@ vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
-    if (shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
         return ambient + diffuse + specular;
     }
     else {
@@ -162,7 +164,7 @@ vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
-    if (shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
+    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + BIAS) {
         return ambient + (diffuse + specular) * attenuation;
     }
     else {
