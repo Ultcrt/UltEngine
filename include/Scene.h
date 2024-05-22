@@ -24,6 +24,11 @@ namespace UltEngine {
         std::filesystem::path(SHADER_DIRECTORY) / "Simplest.vert",
         std::filesystem::path(SHADER_DIRECTORY) / "Simplest.frag"};
 
+        Shader pointShadowMapShader = {
+        std::filesystem::path(SHADER_DIRECTORY) / "PointShadow.vert",
+        std::filesystem::path(SHADER_DIRECTORY) / "PointShadow.geom",
+        std::filesystem::path(SHADER_DIRECTORY) / "PointShadow.frag" };
+
         std::vector<Mesh> meshes_;
         std::unordered_map<std::filesystem::path, unsigned> textureIDs_;
 

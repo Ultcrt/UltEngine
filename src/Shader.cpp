@@ -11,13 +11,34 @@
 namespace UltEngine {
     Shader::Shader(const std::filesystem::path &vertexShaderPath, const std::filesystem::path &fragmentShaderPath) {
         // Create shader object
-        vertexShaderID = CreateShaderObjectFromFile_(vertexShaderPath, GL_VERTEX_SHADER);
-        fragmentShaderID = CreateShaderObjectFromFile_(fragmentShaderPath, GL_FRAGMENT_SHADER);
+        vertexShaderID_ = CreateShaderObjectFromFile_(vertexShaderPath, GL_VERTEX_SHADER);
+        fragmentShaderID_ = CreateShaderObjectFromFile_(fragmentShaderPath, GL_FRAGMENT_SHADER);
 
         // Create and link program
         programID = glCreateProgram();
-        glAttachShader(programID, vertexShaderID);
-        glAttachShader(programID, fragmentShaderID);
+        glAttachShader(programID, vertexShaderID_);
+        glAttachShader(programID, fragmentShaderID_);
+        glLinkProgram(programID);
+        int success;
+        glGetProgramiv(programID, GL_LINK_STATUS, &success);
+        if (!success) {
+            char info[512];
+            glGetProgramInfoLog(programID, 512, nullptr, info);
+            throw std::runtime_error(std::format("Cannot link program:\n{}", info));
+        }
+    }
+
+    Shader::Shader(const std::filesystem::path& vertexShaderPath, const std::filesystem::path& geometryShaderPath, const std::filesystem::path& fragmentShaderPath) {
+        // Create shader object
+        vertexShaderID_ = CreateShaderObjectFromFile_(vertexShaderPath, GL_VERTEX_SHADER);
+        geometryShaderID_ = CreateShaderObjectFromFile_(geometryShaderPath, GL_GEOMETRY_SHADER);
+        fragmentShaderID_ = CreateShaderObjectFromFile_(fragmentShaderPath, GL_FRAGMENT_SHADER);
+
+        // Create and link program
+        programID = glCreateProgram();
+        glAttachShader(programID, vertexShaderID_);
+        glAttachShader(programID, geometryShaderID_);
+        glAttachShader(programID, fragmentShaderID_);
         glLinkProgram(programID);
         int success;
         glGetProgramiv(programID, GL_LINK_STATUS, &success);

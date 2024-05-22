@@ -304,6 +304,11 @@ namespace UltEngine {
                 glDisable(GL_DEPTH_TEST);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 pLightingPassShader_->use();
+                // SamplerCube must be initialized, because default texture unit (0) is used by Sampler2D
+                for (std::size_t idx = 0; idx < 5; idx++) {
+                    glActiveTexture(GL_TEXTURE31);
+                    pLightingPassShader_->set(std::format("pointLights[{}].shadowMap", idx), 31);
+                }
                 scene.prepareCamera(*pLightingPassShader_);
                 scene.prepareLights(*pLightingPassShader_);
                 for (std::size_t idx = 0; idx < geometryGBOs_.size(); idx++) {

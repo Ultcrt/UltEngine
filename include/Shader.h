@@ -14,11 +14,13 @@ namespace UltEngine {
     class Shader {
     private:
         static unsigned CreateShaderObjectFromFile_(const std::filesystem::path& path, GLenum type);
-        unsigned vertexShaderID;
-        unsigned fragmentShaderID;
+        GLuint vertexShaderID_;
+        GLuint geometryShaderID_;
+        GLuint fragmentShaderID_;
 
     public:
         Shader(const std::filesystem::path& vertexShaderPath, const std::filesystem::path& fragmentShaderPath);
+        Shader(const std::filesystem::path& vertexShaderPath, const std::filesystem::path& geometryShaderPath, const std::filesystem::path& fragmentShaderPath);
         void use() const;
         unsigned programID;
 

@@ -39,7 +39,8 @@ namespace UltEngine {
         );
 
         // TODO: Spot light should have attenuation, and attenuation can be used as far plane
-        projection_ = glm::perspective(outerCutoff, static_cast<float>(shadowMapWidth_) / static_cast<float>(shadowMapHeight_), 0.1f, 100.0f);
+        // FOV is two times of outerCutOff angle (max angle between normal and light direction), with some simple geometry, light cam FOV should be two times of outerCutOff so that everything fit in
+        projection_ = glm::perspective(outerCutoff * 2.0f, static_cast<float>(shadowMapWidth_) / static_cast<float>(shadowMapHeight_), 0.01f, 10.0f);
 
         glBindTexture(GL_TEXTURE_2D, shadowMap_);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap_, 0);

@@ -25,9 +25,7 @@ struct PointLight {
     float linear;
     float quadratic;
 
-    sampler2D shadowMap;
-    mat4 view;
-    mat4 projection;
+    samplerCube shadowMap;
 };
 
 struct DirectionalLight {
@@ -136,10 +134,11 @@ vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, ve
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), shininess);
 
     // Shadow
-    vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
-    shadowSpacePosition.xyz /= shadowSpacePosition.w;
-    shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
-    float shadow = PercentageCloserFiltering(lightDir, normal, light.shadowMap, shadowSpacePosition.xy, shadowSpacePosition.z);
+    float shadow = 0.0f;
+    // TODO: debug far
+    if (length(position - light.position) / 10.0f < texture(light.shadowMap, position - light.position).r + MAX_BIAS) {
+        shadow = 1.0f;
+    }
 
     return ambient + shadow * (diffuse + specular) * attenuation;
 }

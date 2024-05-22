@@ -228,18 +228,25 @@ namespace UltEngine {
     }
 
     void Scene::drawShadow() const {
-        // Shadowing pass
-        shadowMapShader.use();
-
         const auto boundingInfo = pCamera_->getBoundingInfo();
         for (const auto& pLight: pLights_) {
             if (pLight->castShadows) {
-                pLight->prepareShadowMap(shadowMapShader, boundingInfo);
+                const Shader* pShader = nullptr;
+                switch (pLight->type()) {
+                case LightType::PointLight:
+                    pShader = &pointShadowMapShader;
+                    break;
+                case LightType::DirectionalLight:
+                case LightType::SpotLight:
+                    pShader = &shadowMapShader;
+                    break;
+                }
+                pShader->use();
+                pLight->prepareShadowMap(*pShader, boundingInfo);
                 // Clean up
-                glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glClear(GL_DEPTH_BUFFER_BIT);
                 for (const Mesh& mesh: meshes_) {
-                    mesh.draw(shadowMapShader);
+                    mesh.draw(*pShader);
                 }
             }
         }

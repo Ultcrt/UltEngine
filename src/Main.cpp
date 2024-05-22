@@ -24,6 +24,7 @@ int main()
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{0.1f, 0.1f, 0.1f});
     pPointLight->translation = {3.0f, 3.0f, 3.0f};
+    pPointLight->castShadows = true;
 
     auto pDirectionalLight = std::make_shared<UltEngine::DirectionalLight>(
             glm::vec3{1.0f, 1.0f, 1.0f},
@@ -62,7 +63,7 @@ int main()
     scene.setEnvironment(pEnvironment);
     scene.addLight(pPointLight);
     scene.addLight(pDirectionalLight);
-    scene.addLight(pSpotLight);
+    //scene.addLight(pSpotLight);
     scene.load(std::filesystem::path(RESOURCES_DIRECTORY) / "backpack/backpack.obj");
 
     pEngine->render(scene);

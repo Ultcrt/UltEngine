@@ -3,6 +3,8 @@
 //
 
 #include <format>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "light/PointLight.h"
 
 namespace UltEngine {
@@ -17,6 +19,12 @@ namespace UltEngine {
         shader.set(std::format("{}[{}].constant", lightSignature, idx), constant);
         shader.set(std::format("{}[{}].linear", lightSignature, idx), linear);
         shader.set(std::format("{}[{}].quadratic", lightSignature, idx), quadratic);
+
+        if (castShadows) {
+            glActiveTexture(GL_TEXTURE0 + unitId);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, shadowMap_);
+            shader.set(std::format("{}[{}].shadowMap", lightSignature, idx), static_cast<int>(unitId++));
+        }
     }
 
     PointLight::PointLight(const glm::vec3& diffuse, const glm::vec3& specular, const glm::vec3& ambient): ILight(diffuse, specular, ambient) {
@@ -40,6 +48,56 @@ namespace UltEngine {
     }
 
     void PointLight::prepareShadowMap(const Shader &shader, const BoundingInfo &frustumBoundingInfo) {
+        glViewport(0, 0, static_cast<GLint>(shadowMapWidth_), static_cast<GLint>(shadowMapHeight_));
 
+        glm::vec3 xAxis = { 1.0f, 0.0f, 0.0f };
+        glm::vec3 yAxis = { 0.0f, 1.0f, 0.0f };
+        glm::vec3 zAxis = { 0.0f, 0.0f, 1.0f };
+
+        std::vector<glm::mat4> views;
+
+        views.emplace_back(glm::lookAt(
+            translation,
+            translation + xAxis,
+            -yAxis
+        ));
+        views.emplace_back(glm::lookAt(
+            translation,
+            translation - xAxis,
+            -yAxis
+        ));
+        views.emplace_back(glm::lookAt(
+            translation,
+            translation + yAxis,
+            zAxis
+        ));
+        views.emplace_back(glm::lookAt(
+            translation,
+            translation - yAxis,
+            -zAxis
+        ));
+        views.emplace_back(glm::lookAt(
+            translation,
+            translation + zAxis,
+            -yAxis
+        ));
+        views.emplace_back(glm::lookAt(
+            translation,
+            translation - zAxis,
+            -yAxis
+        ));
+
+        // TODO: Attenuation can be used as far plane
+        float far = 10.0f;
+        projection_ = glm::perspective(glm::radians(90.0f), static_cast<float>(shadowMapWidth_) / static_cast<float>(shadowMapHeight_), 0.1f, far);
+
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowMap_, 0);
+
+        for (std::size_t idx = 0; idx < 6; idx++) {
+            shader.set(std::format("views[{}]", idx), views[idx]);
+        }
+        shader.set("projection", projection_);
+        shader.set("lightPosition", translation);
+        shader.set("far", far);
     }
 } // UltEngine
