@@ -1,7 +1,7 @@
 #version 330 core
 
-#define MIN_BIAS 0.005
-#define MAX_BIAS 0.05
+#define MIN_BIAS 0.001
+#define MAX_BIAS 0.01
 
 #define POINT_LIGHT_MAX_NUM 5
 #define DIRECTIONAL_LIGHT_MAX_NUM 5
@@ -75,6 +75,7 @@ uniform int pointLightNum;
 uniform int directionalLightNum;
 uniform int spotLightNum;
 
+float PercentageCloserFiltering(vec3 lightDir, vec3 normal, sampler2D shadowMap, vec2 shadowCoord, float depth);
 vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir);
 vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir);
 vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir);
@@ -105,6 +106,25 @@ void main() {
     fragColor = vec4(finalColor, 1.0f);
 }
 
+float PercentageCloserFiltering(vec3 lightDir, vec3 normal, sampler2D shadowMap, vec2 shadowCoord, float depth) {
+    float bias = max(MAX_BIAS * (1 - dot(normal, lightDir)), MIN_BIAS);
+    vec2 offset = 1.0f / textureSize(shadowMap, 0);
+
+    float shadow = 0.0f;
+    // TODO: Should be adjustable
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            // Outside light frustum far plane is also considered as not in shadow (depth <= 1.0f)
+            if (depth <= 1.0f && depth > texture(shadowMap, shadowCoord + vec2(i, j) * offset).r + bias) {
+                shadow += 1.0f;
+            }
+        }
+    }
+    shadow /= 9.0f;
+
+    return 1.0f - shadow;
+}
+
 vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - position);
     vec3 halfVec  = normalize(lightDir + viewDir);
@@ -116,19 +136,12 @@ vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, ve
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), shininess);
 
     // Shadow
-    float bias = max(MAX_BIAS * (1 - dot(normal, lightDir)), MIN_BIAS);
-
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
+    float shadow = PercentageCloserFiltering(lightDir, normal, light.shadowMap, shadowSpacePosition.xy, shadowSpacePosition.z);
 
-    // Outside light frustum far plane is also considered as not in shadow
-    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + bias) {
-        return ambient + (diffuse + specular) * attenuation;
-    }
-    else {
-        return ambient;
-    }
+    return ambient + shadow * (diffuse + specular) * attenuation;
 }
 
 vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir) {
@@ -140,17 +153,12 @@ vec3 CalculateDirectionalLightShading(DirectionalLight light, vec3 position, vec
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f),shininess);
 
     // Shadow
-    float bias = max(MAX_BIAS * (1 - dot(normal, lightDir)), MIN_BIAS);
-
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
-    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + bias) {
-        return ambient + diffuse + specular;
-    }
-    else {
-        return ambient;
-    }
+    float shadow = PercentageCloserFiltering(lightDir, normal, light.shadowMap, shadowSpacePosition.xy, shadowSpacePosition.z);
+
+    return ambient + shadow * (diffuse + specular);
 }
 
 vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3 color, float specularIntensity, float shininess, vec3 viewDir) {
@@ -166,15 +174,10 @@ vec3 CalculateSpotLightShading(SpotLight light, vec3 position, vec3 normal, vec3
     vec3 specular = specularIntensity * light.specular * pow(max(dot(halfVec, normal), 0.0f), shininess);
 
     // Shadow
-    float bias = max(MAX_BIAS * (1 - dot(normal, lightDir)), MIN_BIAS);
-
     vec4 shadowSpacePosition = light.projection * light.view * vec4(position, 1.0f);
     shadowSpacePosition.xyz /= shadowSpacePosition.w;
     shadowSpacePosition.xyz = shadowSpacePosition.xyz * 0.5 + 0.5;
-    if (shadowSpacePosition.z > 1.0f || shadowSpacePosition.z < texture(light.shadowMap, shadowSpacePosition.xy).x + bias) {
-        return ambient + (diffuse + specular) * attenuation;
-    }
-    else {
-        return ambient;
-    }
+    float shadow = PercentageCloserFiltering(lightDir, normal, light.shadowMap, shadowSpacePosition.xy, shadowSpacePosition.z);
+
+    return ambient + shadow * (diffuse + specular) * attenuation;
 }
