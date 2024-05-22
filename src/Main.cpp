@@ -37,6 +37,7 @@ int main()
             glm::vec3{1.0f, 1.0f, 1.0f},
             glm::vec3{0.1f, 0.1f, 0.1f});
     pSpotLight->translation = glm::vec3(0.0f, 0.0f, 1.0f);
+    pSpotLight->castShadows = true;
 
     const std::filesystem::path envDir = std::filesystem::path(RESOURCES_DIRECTORY) / "skybox";
     auto pEnvironment = std::make_shared<UltEngine::CubicEnvironment>(std::array<std::filesystem::path, 6>{

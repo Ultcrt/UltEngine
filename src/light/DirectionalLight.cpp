@@ -69,7 +69,7 @@ namespace UltEngine {
         view_ = glm::lookAt(
                 center,
                 center + direction_,
-                glm::dot(-direction_, yAxis) != 0.0f ? yAxis : xAxis
+                glm::dot(direction_, yAxis) != 0.0f ? yAxis : xAxis
                 );
 
         projection_ = glm::ortho(-radius, radius, -radius, radius, -radius, radius);

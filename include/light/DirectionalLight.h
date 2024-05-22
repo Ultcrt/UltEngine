@@ -9,7 +9,7 @@
 
 namespace UltEngine {
     class DirectionalLight: public ILight {
-    private:
+    protected:
         glm::vec3 direction_ = {0.0f, 0.0f, -1.0f};         // Default
 
     public:
