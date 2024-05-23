@@ -26,6 +26,8 @@ struct PointLight {
     float quadratic;
 
     samplerCube shadowMap;
+
+    float far;
 };
 
 struct DirectionalLight {
@@ -135,8 +137,7 @@ vec3 CalculatePointLightShading(PointLight light, vec3 position, vec3 normal, ve
 
     // Shadow
     float shadow = 0.0f;
-    // TODO: debug far
-    if (length(position - light.position) / 10.0f < texture(light.shadowMap, position - light.position).r + MAX_BIAS) {
+    if (length(position - light.position) / light.far < texture(light.shadowMap, position - light.position).r + MAX_BIAS) {
         shadow = 1.0f;
     }
 

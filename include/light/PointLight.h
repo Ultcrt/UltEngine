@@ -14,6 +14,8 @@ namespace UltEngine {
         float linear = 0.0f;
         float quadratic = 1.0f;
 
+        float far = 10.0f;
+
         explicit PointLight(const glm::vec3& diffuse, const glm::vec3& specular, const glm::vec3& ambient);
 
         void prepare(std::size_t idx, const Shader &shader, std::size_t& unitId) override;

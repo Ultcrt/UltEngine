@@ -25,6 +25,7 @@ namespace UltEngine {
             glActiveTexture(GL_TEXTURE0 + unitId);
             glBindTexture(GL_TEXTURE_CUBE_MAP, shadowMap_);
             shader.set(std::format("{}[{}].shadowMap", lightSignature, idx), static_cast<int>(unitId++));
+            shader.set(std::format("{}[{}].far", lightSignature, idx), far);
         }
     }
 
@@ -89,7 +90,6 @@ namespace UltEngine {
         ));
 
         // TODO: Attenuation can be used as far plane
-        float far = 10.0f;
         projection_ = glm::perspective(glm::radians(90.0f), static_cast<float>(shadowMapWidth_) / static_cast<float>(shadowMapHeight_), 0.1f, far);
 
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowMap_, 0);
